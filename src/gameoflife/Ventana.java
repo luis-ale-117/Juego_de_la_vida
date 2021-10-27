@@ -316,30 +316,11 @@ public class Ventana extends JFrame{
         }
     }
     private void switchEstadoCelula(){    
-//        SpinnerNumberModel sModel1 = new SpinnerNumberModel(0, 0, 999, 1);
-//        SpinnerNumberModel sModel2 = new SpinnerNumberModel(0, 0, 999, 1);
-//        JSpinner spinnerX = new JSpinner(sModel1);
-//        JSpinner spinnerY = new JSpinner(sModel2);
-//        Object[] ob= new Object[5];
-//        ob[0] = "¿Desea ingresar una posicion sin mouse?";
-//        ob[1] = "Posicion en X";
-//        ob[2] = spinnerX;
-//        ob[3] = "Posicion en Y";
-//        ob[4] = spinnerY;
-//        int op = JOptionPane.showOptionDialog(null, ob, "Posicion de la Hormiga", JOptionPane.OK_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
-        //Deten la simulacion
         switch_cell = true;
         running = false;
         tool.startSimText("Sigue");
         tool.startSimEnable(false);
         tool.setZoomDefault();
-
-//        if (op == JOptionPane.OK_OPTION){
-//            switch_cell = false;
-//            tool.startSimEnable(true);
-//        }else{
-//            tool.zoom_sld.setValue(0);
-//        }
     }
     private void resetSim(){
         running = false;

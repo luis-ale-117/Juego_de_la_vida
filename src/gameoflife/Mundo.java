@@ -1,6 +1,9 @@
 
 package gameoflife;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Mundo {
     private static final byte MUERTA=0;
     private static final byte VIVA=1;
@@ -16,6 +19,8 @@ public class Mundo {
     private final int[] regla = new int[4];//R(Smin,Smax,Nmin,Nmax)
     
     private Celula[][] mundo,mundo_aux;
+    
+    private HiloContador hc1,hc2,hc3,hc4;
     
     Mundo(int x, int y){
         toroidal = true;
@@ -133,11 +138,31 @@ public class Mundo {
     public void sigIteracion(){
         /*SIN CONTAR LOS BORDES*/
         /*POSIBLE IMPLEMENTACION DE HILOS*/
-        for(int x=1;x<dimensionX-1;x++){
-            for(int y=1;y<dimensionY-1;y++){
-                sigEstado(x,y);
-            }
+//        for(int x=1;x<dimensionX-1;x++){
+//            for(int y=1;y<dimensionY-1;y++){
+//                sigEstadoHash(x,y);
+//            }
+//        }
+        hc1 = new HiloContador(mundo,mundo_aux, 1, dimensionX/2, 1, dimensionY/2 ,regla);
+        hc2 = new HiloContador(mundo,mundo_aux, dimensionX/2, dimensionX-1, 1, dimensionY/2 ,regla);
+        hc3 = new HiloContador(mundo,mundo_aux, 1, dimensionX/2, dimensionY/2, dimensionY-1 ,regla);
+        hc4 = new HiloContador(mundo,mundo_aux, dimensionX/2, dimensionX-1, dimensionY/2, dimensionY-1 ,regla);
+        
+        hc1.start();
+        hc2.start();
+        hc3.start();
+        hc4.start();
+        try {
+            hc1.join();
+            hc2.join();
+            hc3.join();
+            hc4.join();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MundoPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
+        /*Corregir*/
+        num_vivas = hc1.getVivas()+hc2.getVivas()+hc3.getVivas()+hc4.getVivas();
+        num_muertas = hc1.getMuertas()+hc2.getMuertas()+hc3.getMuertas()+hc4.getMuertas();
         /*PARA LOS BORDES*/
         if(isToroidal()){
             for(int x=0;x<dimensionX;x++){
@@ -236,5 +261,29 @@ public class Mundo {
         }
         
         num_muertas-=num_vivas;
+    }
+    public void sigEstadoHash(int x,int y){
+        int vecinas_vivas = mundo[y-1][x-1].getEstado() +
+                    mundo[y-1][x].getEstado() +
+                    mundo[y-1][x+1].getEstado() +
+                    mundo[y][x-1].getEstado() +
+                    mundo[y][x+1].getEstado() +
+                    mundo[y+1][x-1].getEstado() +
+                    mundo[y+1][x].getEstado() +
+                    mundo[y+1][x+1].getEstado();
+        if(mundo[y][x].isMuerta() && vecinas_vivas>=regla[Nmin] && vecinas_vivas<=regla[Nmax]){
+            mundo_aux[y][x].setViva();
+            num_vivas++;
+            num_muertas--;
+        }else if(mundo[y][x].isViva() && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
+            mundo_aux[y][x].setViva();
+            
+        }else if(mundo[y][x].isViva()){
+            mundo_aux[y][x].setMuerta();
+            num_vivas--;
+            num_muertas++;
+        }else{
+            mundo_aux[y][x].setMuerta();
+        }
     }
 }

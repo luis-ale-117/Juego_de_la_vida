@@ -107,21 +107,6 @@ public class MundoPanel extends JPanel{
         } catch (InterruptedException ex) {
             Logger.getLogger(MundoPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-//        try {
-//            hp2.join();
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(MundoPanel.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        try {
-//            hp3.join();
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(MundoPanel.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        try {
-//            hp4.join();
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(MundoPanel.class.getName()).log(Level.SEVERE, null, ex);
-//        }
     }
     public void sigIteracionSimul(){
         mundo.sigIteracion();
