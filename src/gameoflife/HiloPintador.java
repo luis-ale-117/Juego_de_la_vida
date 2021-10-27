@@ -4,11 +4,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 public class HiloPintador extends Thread{
-    private int inicioX,finalX,inicioY,finalY,celPixeles;
+    private int inicioX,finalX,inicioY,finalY,celPixeles,offsetX,offsetY;
     private Mundo m;
     private Graphics mdraw;
 
-    public HiloPintador(int inicioX, int finalX, int incioY, int finalY,int celPixeles, Mundo m, Graphics mdraw) {
+    public HiloPintador(int inicioX, int finalX, int incioY, int finalY,int celPixeles, Mundo m, Graphics mdraw,int offsetX,int offsetY) {
         this.inicioX = inicioX;
         this.finalX = finalX;
         this.inicioY = incioY;
@@ -16,6 +16,8 @@ public class HiloPintador extends Thread{
         this.celPixeles=celPixeles;
         this.m = m;
         this.mdraw = mdraw;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
     }
     @Override
     public void run(){
@@ -27,7 +29,7 @@ public class HiloPintador extends Thread{
                     }else{
                         mdraw.setColor(Color.BLACK);
                     }
-                    mdraw.fillRect(x*celPixeles,y*celPixeles, celPixeles,celPixeles);
+                    mdraw.fillRect((x-offsetX)*celPixeles,(y-offsetY)*celPixeles, celPixeles,celPixeles);
                 }
             }
         }

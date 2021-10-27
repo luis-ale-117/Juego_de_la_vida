@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 
 public class MundoPanel extends JPanel{
@@ -13,9 +15,11 @@ public class MundoPanel extends JPanel{
     private final int celPixeles,numCelX,numCelY;
     private final int imgX,imgY;//Tamaño original de la imagen
     private final BufferedImage mundoImg;
-    private final Graphics mundoDraw;
+    private final Graphics mundoDraw,md1,md2,md3,md4;
     
     private final Mundo mundo;
+    
+    private HiloPintador hp1,hp2,hp3,hp4;
     
     MundoPanel(int celPix,int mundoX){//Que sea cuadrado
         super();
@@ -30,6 +34,11 @@ public class MundoPanel extends JPanel{
         mundo = new Mundo(numCelX,numCelY);
         mundoImg = new BufferedImage(simulX,simulY,BufferedImage.TYPE_INT_RGB);
         mundoDraw = mundoImg.createGraphics();
+        /*Para los hilos*/
+        md1 = mundoDraw.create(0, 0, imgX/2, imgY/2);
+        md2 = mundoDraw.create(imgX/2, 0, imgX/2, imgY/2);
+        md3 = mundoDraw.create(0, imgY/2, imgX/2, imgY/2);
+        md4 = mundoDraw.create(imgX/2, imgY/2, imgX/2, imgY/2);
     }
     MundoPanel(int celPix, int mundoX, int mundoY){//Puede ser rectangular
         super();
@@ -44,6 +53,11 @@ public class MundoPanel extends JPanel{
         mundo = new Mundo(numCelX,numCelY);
         mundoImg = new BufferedImage(simulX,simulY,BufferedImage.TYPE_INT_RGB);
         mundoDraw = mundoImg.createGraphics();
+        /*Para los hilos*/
+        md1 = mundoDraw.create(0, 0, imgX/2, imgY/2);
+        md2 = mundoDraw.create(imgX/2, 0, imgX/2, imgY/2);
+        md3 = mundoDraw.create(0, imgY/2, imgX/2, imgY/2);
+        md4 = mundoDraw.create(imgX/2, imgY/2, imgX/2, imgY/2);
     }
     public void inicializaMundo(){
         mundoDraw.setColor(Color.BLACK);
@@ -60,18 +74,54 @@ public class MundoPanel extends JPanel{
         mundo.resetMundo();
     }
     private void pintaCelulas(){
-        for(int x=0;x<numCelX;x++){
-            for(int y=0;y<numCelY;y++){
-                if(mundo.cambioCelula(x, y)){
-                    if(mundo.isCelViva(x, y)){
-                        mundoDraw.setColor(Color.WHITE);
-                    }else{
-                        mundoDraw.setColor(Color.BLACK);
-                    }
-                    mundoDraw.fillRect(x*celPixeles,y*celPixeles, celPixeles,celPixeles);
-                }
-            }
+//        for(int x=0;x<numCelX;x++){
+//            for(int y=0;y<numCelY;y++){
+//                if(mundo.cambioCelula(x, y)){
+//                    if(mundo.isCelViva(x, y)){
+//                        mundoDraw.setColor(Color.WHITE);
+//                    }else{
+//                        mundoDraw.setColor(Color.BLACK);
+//                    }
+//                    mundoDraw.fillRect(x*celPixeles,y*celPixeles, celPixeles,celPixeles);
+//                }
+//            }
+//        }
+        hp1 = new HiloPintador(0,numCelX/2,0,numCelY/2,celPixeles,mundo,md1,0,0);
+        hp2 = new HiloPintador(numCelX/2,numCelX,0,numCelY/2,celPixeles,mundo,md2,numCelX/2,0);
+        hp3 = new HiloPintador(0,numCelX/2,numCelY/2,numCelY,celPixeles,mundo,md3,0,numCelY/2);
+        hp4 = new HiloPintador(numCelX/2,numCelX,numCelY/2,numCelY,celPixeles,mundo,md4,numCelX/2,numCelY/2);
+        
+//        md1 = mundoDraw.create(0, 0, ;
+//        md2 = mundoDraw.create(imgX/2, 0, ;
+//        md3 = mundoDraw.create(0, imgY/2, ;
+//        md4 = mundoDraw.create(imgX/2, imgY/2;
+        hp1.start();
+        hp2.start();
+        hp3.start();
+        hp4.start();
+        try {
+            hp1.join();
+            hp2.join();
+            hp3.join();
+            hp4.join();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MundoPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
+//        try {
+//            hp2.join();
+//        } catch (InterruptedException ex) {
+//            Logger.getLogger(MundoPanel.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        try {
+//            hp3.join();
+//        } catch (InterruptedException ex) {
+//            Logger.getLogger(MundoPanel.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        try {
+//            hp4.join();
+//        } catch (InterruptedException ex) {
+//            Logger.getLogger(MundoPanel.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }
     public void sigIteracionSimul(){
         mundo.sigIteracion();
