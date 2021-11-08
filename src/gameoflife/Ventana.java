@@ -68,6 +68,8 @@ public class Ventana extends JFrame{
     public JMenu archivo;
     public JMenuItem abrir_arch,save_arch;
     
+    public Graficas gr;
+    
     /*BANDERAS*/
     public boolean running,switch_cell,graphs_updating;
     
@@ -109,7 +111,7 @@ public class Ventana extends JFrame{
         barra_menu.add(archivo);
         this.setJMenuBar(barra_menu);
         
-        //gr =  new GraphicsWindow();
+        gr =  new Graficas();
         
         setButtonsActions();
         
@@ -128,7 +130,7 @@ public class Ventana extends JFrame{
     public void comienzaSimulacion(){
         chooseKindOfWorld();
         while(true){
-            //gr.updateGraphs(gen_calculos,mp.getNumVivasSimul(),graphs_updating);
+            gr.updateGraphs(gen_calculos,mp.getNumVivasSimul(),graphs_updating);
             /*EN PAUSA SI LO ESTA*/
             loopSiPausado();
             mp.muestraMundo();
@@ -179,7 +181,7 @@ public class Ventana extends JFrame{
         tool.addAction_Graph(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                //showGraphicsWin();
+                showGraphicsWin();
             }
         });
         tool.addAction_Reset(new ActionListener(){
@@ -361,8 +363,8 @@ public class Ventana extends JFrame{
         tool.startSimEnable(true);
     }
     private void showGraphicsWin(){
-        //gr.setVisible(!gr.isVisible());
-        //graphs_updating = gr.isVisible();
+        gr.setVisible(!gr.isVisible());
+        graphs_updating = gr.isVisible();
     }
     private void editCellValue(){
         if(tool.editSelected()){
