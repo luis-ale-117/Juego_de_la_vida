@@ -218,6 +218,12 @@ public class Ventana extends JFrame{
                 speedSimulation();
             }
         });
+        tool.addChange_Regla(new ChangeListener(){
+            @Override
+            public void stateChanged(ChangeEvent e){
+                aplicaRegla();
+            }
+        });
         save_arch.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
@@ -237,10 +243,16 @@ public class Ventana extends JFrame{
         if(running){
             tool.startSimText("Pausa");
             tool.editEnable(false);
+            tool.reglasEnable(false);
+            tool.randomEnable(false);
+            tool.resetEnable(false);
         }
         else{
             tool.startSimText("Sigue");
             tool.editEnable(true);
+            tool.reglasEnable(true);
+            tool.randomEnable(true);
+            tool.resetEnable(true);
         }
     }
     private void zoomSimulation(){
@@ -328,14 +340,14 @@ public class Ventana extends JFrame{
         generation = 0;
         tool.actualizaDatos(0,mp.getNumMuertasSimul(),mp.getNumVivasSimul());
         //gr.clearGraphics();
-        tool.startSimEnable(false);
+        tool.startSimEnable(true);
         //chooseKindOfWorld();
 //        if(tool.zoom_sld.getValue()<0){
 //            tool.zoom_sld.setValue(0);
 //        }
     }
     private void randomSim(){
-        SpinnerNumberModel sModel2 = new SpinnerNumberModel(0, 0, 100, 0.01);
+        SpinnerNumberModel sModel2 = new SpinnerNumberModel(0, 0, 100, 0.1);
         JSpinner spinner2 = new JSpinner(sModel2);
         int option2 = JOptionPane.showOptionDialog(this, spinner2, "Porcentaje casillas vivas", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
         if (option2 == JOptionPane.CANCEL_OPTION){
@@ -361,8 +373,12 @@ public class Ventana extends JFrame{
             running = false;
             tool.startSimText("Sigue");
             tool.startSimEnable(false);
+            tool.randomEnable(false);
+            tool.resetEnable(false);
         }else{
             tool.startSimEnable(true);
+            tool.randomEnable(true);
+            tool.resetEnable(true);
         }
         
     }
@@ -375,6 +391,9 @@ public class Ventana extends JFrame{
                 mp.switchCelEstadoSimul(pos_x, pos_y);
             }
         }
+    }
+    private void aplicaRegla(){
+        mp.setReglaSimul(tool.getSmin(),tool.getSmax(),tool.getNmin(),tool.getNmax());
     }
     private void saveFile(){
     }

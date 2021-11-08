@@ -90,11 +90,7 @@ public class MundoPanel extends JPanel{
         hp2 = new HiloPintador(numCelX/2,numCelX,0,numCelY/2,celPixeles,mundo,md2,numCelX/2,0);
         hp3 = new HiloPintador(0,numCelX/2,numCelY/2,numCelY,celPixeles,mundo,md3,0,numCelY/2);
         hp4 = new HiloPintador(numCelX/2,numCelX,numCelY/2,numCelY,celPixeles,mundo,md4,numCelX/2,numCelY/2);
-        
-//        md1 = mundoDraw.create(0, 0, ;
-//        md2 = mundoDraw.create(imgX/2, 0, ;
-//        md3 = mundoDraw.create(0, imgY/2, ;
-//        md4 = mundoDraw.create(imgX/2, imgY/2;
+
         hp1.start();
         hp2.start();
         hp3.start();
@@ -148,8 +144,8 @@ public class MundoPanel extends JPanel{
         return mundo.getNumVivas();
     }
     @Override
-    public void paint(Graphics g){
-        g.drawImage(mundoImg, 0, 0,simulX,simulY,this);
+    public void paintComponent(Graphics g){
+        g.drawImage(mundoImg, 0, 0,simulX,simulY,this);        
         g.dispose();
     }
     public void addMouse(MouseAdapter m){

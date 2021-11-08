@@ -8,7 +8,8 @@ public class HiloContador extends Thread{
     private static final byte Nmax=3;
     
     private final Celula[][] m,maux;
-    private volatile int vivas,muertas,inicioX,finX,inicioY,finY;
+    private int inicioX,finX,inicioY,finY;
+    private volatile int vivas,muertas;
     private final int[] regla;
 
     public HiloContador(Celula[][] m, Celula[][] maux, int inicioX, int finX, int inicioY, int finY,int[] regla) {
@@ -34,14 +35,11 @@ public class HiloContador extends Thread{
         if(m[y][x].isMuerta() && vecinas_vivas>=regla[Nmin] && vecinas_vivas<=regla[Nmax]){
             maux[y][x].setViva();
             vivas++;
-            muertas--;
         }else if(m[y][x].isViva() && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
             maux[y][x].setViva();
-            
+            vivas++;
         }else if(m[y][x].isViva()){
             maux[y][x].setMuerta();
-            vivas--;
-            muertas++;
         }else{
             maux[y][x].setMuerta();
         }
@@ -60,5 +58,6 @@ public class HiloContador extends Thread{
                 sigEstadoHash(x,y);
             }
         }
+        muertas -= vivas;
     }
 }

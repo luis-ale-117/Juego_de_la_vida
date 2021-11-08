@@ -96,14 +96,14 @@ public class Mundo {
         }
         if(mundo[y][x].isMuerta() && vecinas_vivas>=regla[Nmin] && vecinas_vivas<=regla[Nmax]){
             mundo_aux[y][x].setViva();
-            num_vivas++;
-            num_muertas--;
+//            num_vivas++;
+//            num_muertas--;
         }else if(mundo[y][x].isViva() && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
             mundo_aux[y][x].setViva();
         }else if(mundo[y][x].isViva()){
             mundo_aux[y][x].setMuerta();
-            num_vivas--;
-            num_muertas++;
+//            num_vivas--;
+//            num_muertas++;
         }else{
             mundo_aux[y][x].setMuerta();
         }
@@ -123,14 +123,14 @@ public class Mundo {
         }
         if(mundo[y][x].isMuerta() && vecinas_vivas>=regla[Nmin] && vecinas_vivas<=regla[Nmax]){
             mundo_aux[y][x].setViva();
-            num_vivas++;
-            num_muertas--;
+//            num_vivas++;
+//            num_muertas--;
         }else if(mundo[y][x].isViva() && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
             mundo_aux[y][x].setViva();
         }else if(mundo[y][x].isViva()){
             mundo_aux[y][x].setMuerta();
-            num_vivas--;
-            num_muertas++;
+//            num_vivas--;
+//            num_muertas++;
         }else{
             mundo_aux[y][x].setMuerta();
         }
@@ -164,28 +164,40 @@ public class Mundo {
         num_vivas = hc1.getVivas()+hc2.getVivas()+hc3.getVivas()+hc4.getVivas();
         num_muertas = hc1.getMuertas()+hc2.getMuertas()+hc3.getMuertas()+hc4.getMuertas();
         /*PARA LOS BORDES*/
+        int bordes_vivas=0,bordes_muertas = 2*dimensionX + 2*(dimensionY-2);
         if(isToroidal()){
             for(int x=0;x<dimensionX;x++){
                 sigEstadoBordesToroidal(x,0);
                 sigEstadoBordesToroidal(x,dimensionY-1);
+                bordes_vivas += mundo_aux[0][x].getEstado();
+                bordes_vivas += mundo_aux[dimensionY-1][x].getEstado();
             }
             for(int y=1;y<dimensionY-1;y++){
                 sigEstadoBordesToroidal(0,y);
                 sigEstadoBordesToroidal(dimensionX-1,y);
+                bordes_vivas += mundo_aux[y][0].getEstado();
+                bordes_vivas += mundo_aux[y][dimensionX-1].getEstado();
             }
         }else{
             for(int x=0;x<dimensionX;x++){
                 sigEstadoBordesFinito(x,0);
                 sigEstadoBordesFinito(x,dimensionY-1);
+                bordes_vivas += mundo_aux[0][x].getEstado();
+                bordes_vivas += mundo_aux[dimensionY-1][x].getEstado();
             }
             for(int y=1;y<dimensionY-1;y++){
                 sigEstadoBordesFinito(0,y);
                 sigEstadoBordesFinito(dimensionX-1,y);
+                bordes_vivas += mundo_aux[y][0].getEstado();
+                bordes_vivas += mundo_aux[y][dimensionX-1].getEstado();
             }
         }
+        bordes_muertas -= bordes_vivas;
+        num_vivas += bordes_vivas;
+        num_muertas += bordes_muertas;
         Celula[][] m = mundo;
-        mundo=mundo_aux;
-        mundo_aux=m;
+        mundo = mundo_aux;
+        mundo_aux = m;
     }
     /*POSIBLE BORRADO*/
     public int getCelEstado(int x, int y){
