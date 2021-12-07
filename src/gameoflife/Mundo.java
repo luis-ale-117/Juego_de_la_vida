@@ -18,6 +18,9 @@ public class Mundo {
     private final int dimensionX,dimensionY;
     private final int[] regla = new int[4];//R(Smin,Smax,Nmin,Nmax)
     
+    //Para los atractores
+    private int estado_int=0,n=1;
+    
     private Celula[][] mundo,mundo_aux;
     
     private HiloContador hc1,hc2,hc3,hc4;
@@ -38,6 +41,8 @@ public class Mundo {
                 mundo_aux[ys][xs]=new Celula();
             }
         }
+        //Para las transiciones
+        estado_int=0;n=1;
     }
     public void setToroidal(boolean tor){
         toroidal=tor;
@@ -274,7 +279,7 @@ public class Mundo {
         
         num_muertas-=num_vivas;
     }
-    public void sigEstadoHash(int x,int y){
+    private void sigEstadoHash(int x,int y){
         int vecinas_vivas = mundo[y-1][x-1].getEstado() +
                     mundo[y-1][x].getEstado() +
                     mundo[y-1][x+1].getEstado() +
@@ -297,5 +302,54 @@ public class Mundo {
         }else{
             mundo_aux[y][x].setMuerta();
         }
+    }
+    public int mundoToInt(){
+        /*if(dimensionX>5 || dimensionY>5){
+            return -1;
+        }*/
+
+        estado_int=0;
+        n = 1;
+        for(int x = 0;x<dimensionX;x++){
+            for(int y = 0;y<dimensionY;y++){
+                if(mundo[y][x].isViva()){
+                    estado_int = estado_int | n;//OR
+                }
+                n = n<<1;
+            }
+        }
+        return estado_int;
+        
+        /*0 3 6
+         *1 4 7
+         *2 5 8
+        */
+    }
+    public void intToMundo(int estado){
+        /*if(dimensionX>5 || dimensionY>5){
+            return;
+        }
+        else if (estado > Math.pow(2,dimensionX*dimensionY)){
+            return;
+        }*/
+        n = 1;
+        estado_int = estado;
+        for(int x = 0;x<dimensionX;x++){
+            for(int y = 0;y<dimensionY;y++){
+                if((estado_int & n)>0){
+                    mundo[y][x].setViva();
+                }
+                else{
+                    mundo[y][x].setMuerta();
+                }
+                estado_int = estado_int>>1;
+            }
+        }
+    }
+    public int getDimensionX() {
+        return dimensionX;
+    }
+    public int getDimensionY() {
+        return dimensionY;
     }
 }

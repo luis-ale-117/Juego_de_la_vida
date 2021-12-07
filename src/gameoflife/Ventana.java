@@ -128,6 +128,43 @@ public class Ventana extends JFrame{
         mp.muestraMundo();
     }
     public void comienzaSimulacion(){
+        //Atractores at2x2 = new Atractores(2,2);
+        //at2x2.calculaTransiciones();
+        //System.out.println(at2x2);
+        //Atractores at3x3 = new Atractores(3,3);
+        //at3x3.calculaTransiciones();
+        //System.out.println(at3x3);
+        /*Atractores at4x4 = new Atractores(4,5);
+        at4x4.calculaTransiciones();
+        System.out.println("Fin del calculo");
+        //System.out.println(at4x4);
+        File f = new File("4x5.dot");
+        FileWriter f_w = null;
+        PrintWriter f_pr = null;
+        try {
+            f_w = new FileWriter(f);
+            f_pr = new PrintWriter(f_w);
+            f_pr.write(at4x4.toStringInicio());
+            int pot = (int) Math.pow(2, 4*5);
+            for(int i=0;i<pot;i++){
+                f_pr.write(at4x4.toStringIndex(i));
+            }
+            f_pr.write(at4x4.toStringFin());
+            //f_pr.write(at4x4.toString());
+        } catch (IOException ex) {
+            Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+                try {
+                    f_pr.close();
+                    f_w.close();
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this,
+                    "Error al intentar cerrar el archvio\nError: "+ex,
+                    "Error en Archivo",
+                    JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        */
         chooseKindOfWorld();
         while(true){
             gr.updateGraphs(gen_calculos,mp.getNumVivasSimul(),graphs_updating);
@@ -142,9 +179,6 @@ public class Ventana extends JFrame{
             } catch (InterruptedException ex) {
                 Logger.getLogger(GameOfLife.class.getName()).log(Level.SEVERE, null, ex);
             }
-            /*PINTA LAS CELDAS DONDE ESTUVIERON LAS HORMIGAS*/
-            //paintCellsAndLines();
-            //ifSimEnded();
             generation++;
             if(graphs_updating){
                 gen_calculos++;
@@ -245,7 +279,7 @@ public class Ventana extends JFrame{
         if(running){
             tool.startSimText("Pausa");
             tool.editEnable(false);
-            tool.reglasEnable(false);
+            //tool.reglasEnable(false);
             tool.randomEnable(false);
             tool.resetEnable(false);
         }
@@ -395,7 +429,15 @@ public class Ventana extends JFrame{
         }
     }
     private void aplicaRegla(){
+        boolean play = running;
+        running = false;
+        try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(GameOfLife.class.getName()).log(Level.SEVERE, null, ex);
+            }
         mp.setReglaSimul(tool.getSmin(),tool.getSmax(),tool.getNmin(),tool.getNmax());
+        running=play;
     }
     private void saveFile(){
     }
