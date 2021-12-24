@@ -5,8 +5,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Mundo {
-    private static final byte MUERTA=0;
-    private static final byte VIVA=1;
+    private static final int MUERTA=0;
+    private static final int VIVA=1;
     //S:supervivencia,N:Nacimiento
     private static final byte Smin=0;
     private static final byte Smax=1;
@@ -21,14 +21,14 @@ public class Mundo {
     //Para los atractores
     private int estado_int=0,n=1;
     
-    private Celula[][] mundo,mundo_aux;
+    private int[][] mundo,mundo_aux;
     
     private HiloContador hc1,hc2,hc3,hc4;
     
     Mundo(int x, int y){
         toroidal = true;
-        mundo = new Celula[y][x];
-        mundo_aux = new Celula[y][x];
+        mundo = new int[y][x];
+        mundo_aux = new int[y][x];
         dimensionX = x;
         dimensionY = y;
         num_muertas = x*y;
@@ -37,8 +37,8 @@ public class Mundo {
         
         for(int xs=0;xs<dimensionX;xs++){
             for(int ys=0;ys<dimensionY;ys++){
-                mundo[ys][xs]=new Celula();
-                mundo_aux[ys][xs]=new Celula();
+                mundo[ys][xs] = MUERTA;
+                mundo_aux[ys][xs] = MUERTA;
             }
         }
         //Para las transiciones
@@ -57,7 +57,7 @@ public class Mundo {
         int[] r = {regla[Smin],regla[Smax],regla[Nmin],regla[Nmax]};
         return r;
     }
-    private void sigEstado(int x,int y){
+/*    private void sigEstado(int x,int y){
         int vecinas_vivas=0;
         for(int xaux=x-1 ;xaux<=x+1 ;xaux++){
             for(int yaux=y-1 ;yaux<=y+1 ;yaux++){
@@ -81,6 +81,7 @@ public class Mundo {
             mundo_aux[y][x].setMuerta();
         }
     }
+*/
     private void sigEstadoBordesToroidal(int x,int y){
         int vecinas_vivas=0;
         
@@ -89,45 +90,46 @@ public class Mundo {
         int xmenos1 = x-1<0?dimensionX-1:x-1;
         int xmas1 = x+1>=dimensionX?0:x+1;
         
-        vecinas_vivas =  mundo[ymenos1][xmenos1].getEstado() +
-                    mundo[ymenos1][x].getEstado() +
-                    mundo[ymenos1][xmas1].getEstado() +
-                    mundo[y][xmenos1].getEstado() +
-                    mundo[y][xmas1].getEstado() +
-                    mundo[ymas1][xmenos1].getEstado() +
-                    mundo[ymas1][x].getEstado() +
-                    mundo[ymas1][xmas1].getEstado();
+        vecinas_vivas =  mundo[ymenos1][xmenos1] +
+                    mundo[ymenos1][x] +
+                    mundo[ymenos1][xmas1] +
+                    mundo[y][xmenos1] +
+                    mundo[y][xmas1] +
+                    mundo[ymas1][xmenos1] +
+                    mundo[ymas1][x] +
+                    mundo[ymas1][xmas1];
         
-        if(mundo[y][x].isMuerta() && vecinas_vivas>=regla[Nmin] && vecinas_vivas<=regla[Nmax]){
-            mundo_aux[y][x].setViva();
-        }else if(mundo[y][x].isViva() && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
-            mundo_aux[y][x].setViva();
-        }else if(mundo[y][x].isViva()){
-            mundo_aux[y][x].setMuerta();
+        if(mundo[y][x]==MUERTA && vecinas_vivas>=regla[Nmin] && vecinas_vivas<=regla[Nmax]){
+            mundo_aux[y][x] = VIVA;
+        }else if(mundo[y][x]==VIVA && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
+            mundo_aux[y][x] = VIVA;
+        }else if(mundo[y][x]==VIVA){
+            mundo_aux[y][x] = MUERTA;
         }else{
-            mundo_aux[y][x].setMuerta();
+            mundo_aux[y][x] = MUERTA;
         }
     }
     /*SE CONSIDERAN CELULAS MUERTAS FUERA DE LOS BORDES*/
     private void sigEstadoBordesFinito(int x,int y){
         int vecinas_vivas=0;
         
-        vecinas_vivas =  y-1<0 || x-1<0 ? 0:mundo[y-1][x-1].getEstado() +
-                    y-1<0 ? 0:mundo[y-1][x].getEstado() +
-                    y-1<0 || x+1>=dimensionX ? 0:mundo[y-1][x+1].getEstado() +
-                    x-1<0 ? 0:mundo[y][x-1].getEstado() +
-                    x+1>=dimensionX ? 0:mundo[y][x+1].getEstado() +
-                    y+1>=dimensionY || x-1<0 ? 0:mundo[y+1][x-1].getEstado() +
-                    y+1>=dimensionY ? 0:mundo[y+1][x].getEstado() +
-                    y+1>=dimensionY || x+1>=dimensionX ? 0:mundo[y+1][x+1].getEstado();
-        if(mundo[y][x].isMuerta() && vecinas_vivas>=regla[Nmin] && vecinas_vivas<=regla[Nmax]){
-            mundo_aux[y][x].setViva();
-        }else if(mundo[y][x].isViva() && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
-            mundo_aux[y][x].setViva();
-        }else if(mundo[y][x].isViva()){
-            mundo_aux[y][x].setMuerta();
+        vecinas_vivas =  y-1<0 || x-1<0 ? 0:mundo[y-1][x-1] +
+                    y-1<0 ? 0:mundo[y-1][x] +
+                    y-1<0 || x+1>=dimensionX ? 0:mundo[y-1][x+1] +
+                    x-1<0 ? 0:mundo[y][x-1] +
+                    x+1>=dimensionX ? 0:mundo[y][x+1] +
+                    y+1>=dimensionY || x-1<0 ? 0:mundo[y+1][x-1] +
+                    y+1>=dimensionY ? 0:mundo[y+1][x] +
+                    y+1>=dimensionY || x+1>=dimensionX ? 0:mundo[y+1][x+1];
+        
+        if(mundo[y][x]==MUERTA && vecinas_vivas>=regla[Nmin] && vecinas_vivas<=regla[Nmax]){
+            mundo_aux[y][x]=VIVA;
+        }else if(mundo[y][x]==VIVA && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
+            mundo_aux[y][x]=VIVA;
+        }else if(mundo[y][x]==VIVA){
+            mundo_aux[y][x]=MUERTA;
         }else{
-            mundo_aux[y][x].setMuerta();
+            mundo_aux[y][x]=MUERTA;
         }
     }
     public void sigIteracion(){
@@ -158,71 +160,72 @@ public class Mundo {
             for(int x=0;x<dimensionX;x++){
                 sigEstadoBordesToroidal(x,0);
                 sigEstadoBordesToroidal(x,dimensionY-1);
-                bordes_vivas += mundo_aux[0][x].getEstado();
-                bordes_vivas += mundo_aux[dimensionY-1][x].getEstado();
+                bordes_vivas += mundo_aux[0][x];
+                bordes_vivas += mundo_aux[dimensionY-1][x];
             }
             for(int y=1;y<dimensionY-1;y++){
                 sigEstadoBordesToroidal(0,y);
                 sigEstadoBordesToroidal(dimensionX-1,y);
-                bordes_vivas += mundo_aux[y][0].getEstado();
-                bordes_vivas += mundo_aux[y][dimensionX-1].getEstado();
+                bordes_vivas += mundo_aux[y][0];
+                bordes_vivas += mundo_aux[y][dimensionX-1];
             }
         }else{
             for(int x=0;x<dimensionX;x++){
                 sigEstadoBordesFinito(x,0);
                 sigEstadoBordesFinito(x,dimensionY-1);
-                bordes_vivas += mundo_aux[0][x].getEstado();
-                bordes_vivas += mundo_aux[dimensionY-1][x].getEstado();
+                bordes_vivas += mundo_aux[0][x];
+                bordes_vivas += mundo_aux[dimensionY-1][x];
             }
             for(int y=1;y<dimensionY-1;y++){
                 sigEstadoBordesFinito(0,y);
                 sigEstadoBordesFinito(dimensionX-1,y);
-                bordes_vivas += mundo_aux[y][0].getEstado();
-                bordes_vivas += mundo_aux[y][dimensionX-1].getEstado();
+                bordes_vivas += mundo_aux[y][0];
+                bordes_vivas += mundo_aux[y][dimensionX-1];
             }
         }
         bordes_muertas -= bordes_vivas;
         num_vivas += bordes_vivas;
         num_muertas += bordes_muertas;
-        Celula[][] m = mundo;
+        int[][] m = mundo;
         mundo = mundo_aux;
         mundo_aux = m;
     }
     /*POSIBLE BORRADO*/
-    public int getCelEstado(int x, int y){
+    
+    /*public int getCelEstado(int x, int y){
         return mundo[y][x].getEstado();
-    }
+    }*/
     public boolean isCelViva(int x, int y){
-        return mundo[y][x].isViva();
+        return mundo[y][x]==VIVA;
     }
-    public boolean isCelMuerta(int x, int y){
+    /*public boolean isCelMuerta(int x, int y){
         return mundo[y][x].isMuerta();
-    }
-    private boolean isCelAnteriorViva(int x, int y){
+    }*/
+    /*private boolean isCelAnteriorViva(int x, int y){
         return mundo_aux[y][x].isViva();
-    }
-    private boolean isCelAnteriorMuerta(int x, int y){
+    }*/
+    /*private boolean isCelAnteriorMuerta(int x, int y){
         return mundo_aux[y][x].isMuerta();
-    }
+    }*/
     public boolean cambioCelula(int x,int y){
-        return isCelViva(x,y) ^ isCelAnteriorViva(x,y);
+        return mundo[y][x]==VIVA ^ mundo_aux[y][x]==MUERTA;
     }
     /*POSIBLE BORRADO*/
     public void setCelEstado(int x, int y, int est){
-        if(mundo[y][x].isViva() && est==MUERTA){
+        if(mundo[y][x]==VIVA && est==MUERTA){
             num_muertas++;
             num_vivas--;
-            mundo[y][x].setMuerta();
+            mundo[y][x]=MUERTA;
         }
-        else if(mundo[y][x].isMuerta() && est==VIVA){
+        else if(mundo[y][x]==MUERTA && est==VIVA){
             num_muertas--;
             num_vivas++;
-            mundo[y][x].setViva();
+            mundo[y][x]=VIVA;
         }
     }
     public void switchCelEstado(int x, int y){
-        mundo[y][x].switchEstado();
-        if(mundo[y][x].isViva()){
+        mundo[y][x] = mundo[y][x]==VIVA?MUERTA:VIVA;
+        if(mundo[y][x]==VIVA){
             num_vivas++;
             num_muertas--;
         }else{
@@ -239,7 +242,7 @@ public class Mundo {
     public void resetMundo(){
         for(int x = 0;x<dimensionX;x++){
             for(int y = 0;y<dimensionY;y++){
-                mundo[y][x].setMuerta();
+                mundo[y][x]=MUERTA;
             }
         }
         num_vivas=0;
@@ -253,10 +256,10 @@ public class Mundo {
         for(int x = 0;x<dimensionX;x++){
             for(int y = 0;y<dimensionY;y++){
                 if(Math.random()<=porcen_vivas){
-                    mundo[y][x].setViva();
+                    mundo[y][x]=VIVA;
                     num_vivas++;
                 }else{
-                    mundo[y][x].setMuerta();
+                    mundo[y][x]=MUERTA;
                 }
             }
         }
@@ -264,27 +267,26 @@ public class Mundo {
         num_muertas-=num_vivas;
     }
     private void sigEstadoHash(int x,int y){
-        int vecinas_vivas = mundo[y-1][x-1].getEstado() +
-                    mundo[y-1][x].getEstado() +
-                    mundo[y-1][x+1].getEstado() +
-                    mundo[y][x-1].getEstado() +
-                    mundo[y][x+1].getEstado() +
-                    mundo[y+1][x-1].getEstado() +
-                    mundo[y+1][x].getEstado() +
-                    mundo[y+1][x+1].getEstado();
-        if(mundo[y][x].isMuerta() && vecinas_vivas>=regla[Nmin] && vecinas_vivas<=regla[Nmax]){
-            mundo_aux[y][x].setViva();
+        int vecinas_vivas = mundo[y-1][x-1] +
+                    mundo[y-1][x] +
+                    mundo[y-1][x+1] +
+                    mundo[y][x-1] +
+                    mundo[y][x+1] +
+                    mundo[y+1][x-1] +
+                    mundo[y+1][x] +
+                    mundo[y+1][x+1];
+        if(mundo[y][x]==MUERTA && vecinas_vivas>=regla[Nmin] && vecinas_vivas<=regla[Nmax]){
+            mundo_aux[y][x]=VIVA;
             num_vivas++;
             num_muertas--;
-        }else if(mundo[y][x].isViva() && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
-            mundo_aux[y][x].setViva();
-            
-        }else if(mundo[y][x].isViva()){
-            mundo_aux[y][x].setMuerta();
+        }else if(mundo[y][x]==VIVA && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
+            mundo_aux[y][x]=VIVA;
+        }else if(mundo[y][x]==VIVA){
+            mundo_aux[y][x]=MUERTA;
             num_vivas--;
             num_muertas++;
         }else{
-            mundo_aux[y][x].setMuerta();
+            mundo_aux[y][x]=MUERTA;
         }
     }
     public int mundoToInt(){
@@ -296,7 +298,7 @@ public class Mundo {
         n = 1;
         for(int x = 0;x<dimensionX;x++){
             for(int y = 0;y<dimensionY;y++){
-                if(mundo[y][x].isViva()){
+                if(mundo[y][x]==VIVA){
                     estado_int = estado_int | n;//OR
                 }
                 n = n<<1;
@@ -321,10 +323,10 @@ public class Mundo {
         for(int x = 0;x<dimensionX;x++){
             for(int y = 0;y<dimensionY;y++){
                 if((estado_int & n)>0){
-                    mundo[y][x].setViva();
+                    mundo[y][x]=VIVA;
                 }
                 else{
-                    mundo[y][x].setMuerta();
+                    mundo[y][x]=MUERTA;
                 }
                 estado_int = estado_int>>1;
             }
