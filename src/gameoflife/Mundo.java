@@ -5,8 +5,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Mundo {
-    private static final int MUERTA=0;
-    private static final int VIVA=1;
+    private static final byte MUERTA=0;
+    private static final byte VIVA=1;
     //S:supervivencia,N:Nacimiento
     private static final byte Smin=0;
     private static final byte Smax=1;
@@ -21,14 +21,14 @@ public class Mundo {
     //Para los atractores
     private int estado_int=0,n=1;
     
-    private int[][] mundo,mundo_aux;
+    private byte[][] mundo,mundo_aux;
     
     private HiloContador hc1,hc2,hc3,hc4;
     
     Mundo(int x, int y){
         toroidal = true;
-        mundo = new int[y][x];
-        mundo_aux = new int[y][x];
+        mundo = new byte[y][x];
+        mundo_aux = new byte[y][x];
         dimensionX = x;
         dimensionY = y;
         num_muertas = x*y;
@@ -57,31 +57,6 @@ public class Mundo {
         int[] r = {regla[Smin],regla[Smax],regla[Nmin],regla[Nmax]};
         return r;
     }
-/*    private void sigEstado(int x,int y){
-        int vecinas_vivas=0;
-        for(int xaux=x-1 ;xaux<=x+1 ;xaux++){
-            for(int yaux=y-1 ;yaux<=y+1 ;yaux++){
-                if((yaux!=y || xaux!=x) && mundo[yaux][xaux].isViva()){
-                    vecinas_vivas++;
-                }
-            }
-        }
-        if(mundo[y][x].isMuerta() && vecinas_vivas>=regla[Nmin] && vecinas_vivas<=regla[Nmax]){
-            mundo_aux[y][x].setViva();
-            num_vivas++;
-            num_muertas--;
-        }else if(mundo[y][x].isViva() && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
-            mundo_aux[y][x].setViva();
-            
-        }else if(mundo[y][x].isViva()){
-            mundo_aux[y][x].setMuerta();
-            num_vivas--;
-            num_muertas++;
-        }else{
-            mundo_aux[y][x].setMuerta();
-        }
-    }
-*/
     private void sigEstadoBordesToroidal(int x,int y){
         int vecinas_vivas=0;
         
@@ -186,7 +161,7 @@ public class Mundo {
         bordes_muertas -= bordes_vivas;
         num_vivas += bordes_vivas;
         num_muertas += bordes_muertas;
-        int[][] m = mundo;
+        byte[][] m = mundo;
         mundo = mundo_aux;
         mundo_aux = m;
     }
@@ -208,7 +183,7 @@ public class Mundo {
         return mundo_aux[y][x].isMuerta();
     }*/
     public boolean cambioCelula(int x,int y){
-        return mundo[y][x]==VIVA ^ mundo_aux[y][x]==MUERTA;
+        return mundo[y][x]==VIVA ^ mundo_aux[y][x]==VIVA;
     }
     /*POSIBLE BORRADO*/
     public void setCelEstado(int x, int y, int est){
