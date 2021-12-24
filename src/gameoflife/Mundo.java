@@ -41,8 +41,33 @@ public class Mundo {
                 mundo_aux[ys][xs] = MUERTA;
             }
         }
+        hc1 = new HiloContador(mundo,mundo_aux, 1, dimensionX/2, 1, dimensionY/2 ,regla);
+        hc2 = new HiloContador(mundo,mundo_aux, dimensionX/2, dimensionX-1, 1, dimensionY/2 ,regla);
+        hc3 = new HiloContador(mundo,mundo_aux, 1, dimensionX/2, dimensionY/2, dimensionY-1 ,regla);
+        hc4 = new HiloContador(mundo,mundo_aux, dimensionX/2, dimensionX-1, dimensionY/2, dimensionY-1 ,regla);
+        
         //Para las transiciones
         estado_int=0;n=1;
+    }
+    public void iniciaHilosContadores(){
+        hc1.start();
+        hc2.start();
+        hc3.start();
+        hc4.start();
+    }
+    public void destruyeHilosContadores(){
+        hc1.destruyeHilo();
+        hc2.destruyeHilo();
+        hc3.destruyeHilo();
+        hc4.destruyeHilo();
+        try {
+            hc1.join();
+            hc2.join();
+            hc3.join();
+            hc4.join();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MundoPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     public void setToroidal(boolean tor){
         toroidal=tor;
@@ -78,8 +103,6 @@ public class Mundo {
             mundo_aux[y][x] = VIVA;
         }else if(mundo[y][x]==VIVA && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
             mundo_aux[y][x] = VIVA;
-        }else if(mundo[y][x]==VIVA){
-            mundo_aux[y][x] = MUERTA;
         }else{
             mundo_aux[y][x] = MUERTA;
         }
@@ -101,31 +124,24 @@ public class Mundo {
             mundo_aux[y][x]=VIVA;
         }else if(mundo[y][x]==VIVA && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
             mundo_aux[y][x]=VIVA;
-        }else if(mundo[y][x]==VIVA){
-            mundo_aux[y][x]=MUERTA;
         }else{
             mundo_aux[y][x]=MUERTA;
         }
     }
     public void sigIteracion(){
         /*SIN CONTAR LOS BORDES*/
-        hc1 = new HiloContador(mundo,mundo_aux, 1, dimensionX/2, 1, dimensionY/2 ,regla);
-        hc2 = new HiloContador(mundo,mundo_aux, dimensionX/2, dimensionX-1, 1, dimensionY/2 ,regla);
-        hc3 = new HiloContador(mundo,mundo_aux, 1, dimensionX/2, dimensionY/2, dimensionY-1 ,regla);
-        hc4 = new HiloContador(mundo,mundo_aux, dimensionX/2, dimensionX-1, dimensionY/2, dimensionY-1 ,regla);
+        hc1.hazIteracion();
+        hc2.hazIteracion();
+        hc3.hazIteracion();
+        hc4.hazIteracion();
         
-        hc1.start();
-        hc2.start();
-        hc3.start();
-        hc4.start();
-        try {
-            hc1.join();
-            hc2.join();
-            hc3.join();
-            hc4.join();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(MundoPanel.class.getName()).log(Level.SEVERE, null, ex);
+        while(hc1.enActividad() || hc2.enActividad() || hc3.enActividad() || hc4.enActividad()){
+            continue;
         }
+        hc1.intercambiaMundos();
+        hc2.intercambiaMundos();
+        hc3.intercambiaMundos();
+        hc4.intercambiaMundos();
         
         num_vivas = hc1.getVivas()+hc2.getVivas()+hc3.getVivas()+hc4.getVivas();
         num_muertas = hc1.getMuertas()+hc2.getMuertas()+hc3.getMuertas()+hc4.getMuertas();
@@ -165,23 +181,9 @@ public class Mundo {
         mundo = mundo_aux;
         mundo_aux = m;
     }
-    /*POSIBLE BORRADO*/
-    
-    /*public int getCelEstado(int x, int y){
-        return mundo[y][x].getEstado();
-    }*/
     public boolean isCelViva(int x, int y){
         return mundo[y][x]==VIVA;
     }
-    /*public boolean isCelMuerta(int x, int y){
-        return mundo[y][x].isMuerta();
-    }*/
-    /*private boolean isCelAnteriorViva(int x, int y){
-        return mundo_aux[y][x].isViva();
-    }*/
-    /*private boolean isCelAnteriorMuerta(int x, int y){
-        return mundo_aux[y][x].isMuerta();
-    }*/
     public boolean cambioCelula(int x,int y){
         return mundo[y][x]==VIVA ^ mundo_aux[y][x]==VIVA;
     }

@@ -9,12 +9,20 @@ public class HiloContador extends Thread{
     private static final byte Nmin=2;
     private static final byte Nmax=3;
     
-    private final byte[][] m,maux;
-    private int inicioX,finX,inicioY,finY;
+    private byte[][] m,maux;
+    private final int inicioX,finX,inicioY,finY;
     private volatile int vivas,muertas;
     private final int[] regla;
 
+    /*PARA CONTROLAR EL HILO*/
+    private volatile boolean trabaja;
+    private volatile boolean destruido;
+    
     public HiloContador(byte[][] m, byte[][] maux, int inicioX, int finX, int inicioY, int finY,int[] regla) {
+        super();
+        this.destruido = false;
+        this.trabaja = false;
+        
         this.m = m;
         this.maux = maux;
         this.inicioX = inicioX;
@@ -25,7 +33,7 @@ public class HiloContador extends Thread{
         this.muertas = (finX-inicioX)*(finY-inicioY);
         this.regla=regla;
     }
-    public void sigEstadoHash(int x,int y){
+    private void sigEstado(int x,int y){
         int vecinas_vivas = m[y-1][x-1] +
                     m[y-1][x] +
                     m[y-1][x+1] +
@@ -40,8 +48,6 @@ public class HiloContador extends Thread{
         }else if(m[y][x]==VIVA && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
             maux[y][x]=VIVA;
             vivas++;
-        }else if(m[y][x]==VIVA){
-            maux[y][x]=MUERTA;
         }else{
             maux[y][x]=MUERTA;
         }
@@ -53,13 +59,38 @@ public class HiloContador extends Thread{
     public int getMuertas() {
         return muertas;
     }
+    public void intercambiaMundos(){
+        byte[][] mun;
+        mun = m;
+        m = maux;
+        maux = mun;
+    }
+    public void destruyeHilo(){
+        this.destruido=true;
+    }
+    public void hazIteracion(){
+        this.trabaja=true;
+    }
+    public boolean enActividad(){
+        return trabaja;
+    }
     @Override
     public void run(){
-        for(int x=inicioX;x<finX;x++){
-            for(int y=inicioY;y<finY;y++){
-                sigEstadoHash(x,y);
+        while(!destruido){
+            while(!trabaja && !destruido){
+                continue;
             }
+            if(trabaja && !destruido){
+                vivas = 0;
+                muertas = (finX-inicioX)*(finY-inicioY);
+                for(int x=inicioX;x<finX;x++){
+                    for(int y=inicioY;y<finY;y++){
+                        sigEstado(x,y);
+                    }
+                }
+                muertas -= vivas;
+            }
+            trabaja=false;
         }
-        muertas -= vivas;
     }
 }

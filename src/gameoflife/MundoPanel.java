@@ -60,6 +60,7 @@ public class MundoPanel extends JPanel{
         md4 = mundoDraw.create(imgX/2, imgY/2, imgX/2, imgY/2);
     }
     public void inicializaMundo(){
+        mundo.iniciaHilosContadores();
         mundoDraw.setColor(Color.BLACK);
         mundoDraw.fillRect(0, 0, imgX-1, imgY-1);
     }
@@ -74,18 +75,6 @@ public class MundoPanel extends JPanel{
         mundo.resetMundo();
     }
     private void pintaCelulas(){
-//        for(int x=0;x<numCelX;x++){
-//            for(int y=0;y<numCelY;y++){
-//                if(mundo.cambioCelula(x, y)){
-//                    if(mundo.isCelViva(x, y)){
-//                        mundoDraw.setColor(Color.WHITE);
-//                    }else{
-//                        mundoDraw.setColor(Color.BLACK);
-//                    }
-//                    mundoDraw.fillRect(x*celPixeles,y*celPixeles, celPixeles,celPixeles);
-//                }
-//            }
-//        }
         hp1 = new HiloPintador(0,numCelX/2,0,numCelY/2,celPixeles,mundo,md1,0,0);
         hp2 = new HiloPintador(numCelX/2,numCelX,0,numCelY/2,celPixeles,mundo,md2,numCelX/2,0);
         hp3 = new HiloPintador(0,numCelX/2,numCelY/2,numCelY,celPixeles,mundo,md3,0,numCelY/2);
