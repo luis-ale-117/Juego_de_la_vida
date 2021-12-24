@@ -83,32 +83,27 @@ public class Mundo {
     }
     private void sigEstadoBordesToroidal(int x,int y){
         int vecinas_vivas=0;
-        int xs,ys;
-        for(int xaux=x-1 ;xaux<=x+1 ;xaux++){
-            for(int yaux=y-1 ;yaux<=y+1 ;yaux++){
-                xs=xaux; ys=yaux;
-                
-                if(yaux<0){ ys=dimensionY-1;}
-                else if(yaux>dimensionY-1){ys=0;}
-                
-                if(xaux<0){xs=dimensionX-1;}
-                else if(xaux>dimensionX-1){xs=0;}
-                
-                if((ys!=y || xs!=x) && mundo[ys][xs].isViva()){
-                    vecinas_vivas++;
-                }
-            }
-        }
+        
+        int ymenos1 = y-1<0?dimensionY-1:y-1;
+        int ymas1 = y+1>=dimensionY?0:y+1;
+        int xmenos1 = x-1<0?dimensionX-1:x-1;
+        int xmas1 = x+1>=dimensionX?0:x+1;
+        
+        vecinas_vivas =  mundo[ymenos1][xmenos1].getEstado() +
+                    mundo[ymenos1][x].getEstado() +
+                    mundo[ymenos1][xmas1].getEstado() +
+                    mundo[y][xmenos1].getEstado() +
+                    mundo[y][xmas1].getEstado() +
+                    mundo[ymas1][xmenos1].getEstado() +
+                    mundo[ymas1][x].getEstado() +
+                    mundo[ymas1][xmas1].getEstado();
+        
         if(mundo[y][x].isMuerta() && vecinas_vivas>=regla[Nmin] && vecinas_vivas<=regla[Nmax]){
             mundo_aux[y][x].setViva();
-//            num_vivas++;
-//            num_muertas--;
         }else if(mundo[y][x].isViva() && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
             mundo_aux[y][x].setViva();
         }else if(mundo[y][x].isViva()){
             mundo_aux[y][x].setMuerta();
-//            num_vivas--;
-//            num_muertas++;
         }else{
             mundo_aux[y][x].setMuerta();
         }
@@ -116,38 +111,27 @@ public class Mundo {
     /*SE CONSIDERAN CELULAS MUERTAS FUERA DE LOS BORDES*/
     private void sigEstadoBordesFinito(int x,int y){
         int vecinas_vivas=0;
-        for(int xaux=x-1 ;xaux<=x+1 ;xaux++){
-            for(int yaux=y-1 ;yaux<=y+1 ;yaux++){
-                /*Si no es fuera de los bordes*/
-                if(!(yaux<0 || yaux>dimensionY-1 || xaux<0 || xaux>dimensionX-1)){
-                    if((yaux!=y || xaux!=x) && mundo[yaux][xaux].isViva()){
-                        vecinas_vivas++;
-                    }
-                }
-            }
-        }
+        
+        vecinas_vivas =  y-1<0 || x-1<0 ? 0:mundo[y-1][x-1].getEstado() +
+                    y-1<0 ? 0:mundo[y-1][x].getEstado() +
+                    y-1<0 || x+1>=dimensionX ? 0:mundo[y-1][x+1].getEstado() +
+                    x-1<0 ? 0:mundo[y][x-1].getEstado() +
+                    x+1>=dimensionX ? 0:mundo[y][x+1].getEstado() +
+                    y+1>=dimensionY || x-1<0 ? 0:mundo[y+1][x-1].getEstado() +
+                    y+1>=dimensionY ? 0:mundo[y+1][x].getEstado() +
+                    y+1>=dimensionY || x+1>=dimensionX ? 0:mundo[y+1][x+1].getEstado();
         if(mundo[y][x].isMuerta() && vecinas_vivas>=regla[Nmin] && vecinas_vivas<=regla[Nmax]){
             mundo_aux[y][x].setViva();
-//            num_vivas++;
-//            num_muertas--;
         }else if(mundo[y][x].isViva() && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
             mundo_aux[y][x].setViva();
         }else if(mundo[y][x].isViva()){
             mundo_aux[y][x].setMuerta();
-//            num_vivas--;
-//            num_muertas++;
         }else{
             mundo_aux[y][x].setMuerta();
         }
     }
     public void sigIteracion(){
         /*SIN CONTAR LOS BORDES*/
-        /*POSIBLE IMPLEMENTACION DE HILOS*/
-//        for(int x=1;x<dimensionX-1;x++){
-//            for(int y=1;y<dimensionY-1;y++){
-//                sigEstadoHash(x,y);
-//            }
-//        }
         hc1 = new HiloContador(mundo,mundo_aux, 1, dimensionX/2, 1, dimensionY/2 ,regla);
         hc2 = new HiloContador(mundo,mundo_aux, dimensionX/2, dimensionX-1, 1, dimensionY/2 ,regla);
         hc3 = new HiloContador(mundo,mundo_aux, 1, dimensionX/2, dimensionY/2, dimensionY-1 ,regla);
@@ -165,7 +149,7 @@ public class Mundo {
         } catch (InterruptedException ex) {
             Logger.getLogger(MundoPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        /*Corregir*/
+        
         num_vivas = hc1.getVivas()+hc2.getVivas()+hc3.getVivas()+hc4.getVivas();
         num_muertas = hc1.getMuertas()+hc2.getMuertas()+hc3.getMuertas()+hc4.getMuertas();
         /*PARA LOS BORDES*/
