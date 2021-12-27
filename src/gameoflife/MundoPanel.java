@@ -60,7 +60,7 @@ public class MundoPanel extends JPanel{
         md4 = mundoDraw.create(imgX/2, imgY/2, imgX/2, imgY/2);
     }
     public void inicializaMundo(){
-        mundo.iniciaHilosContadores();
+        //mundo.iniciaHilosContadores();
         mundoDraw.setColor(Color.BLACK);
         mundoDraw.fillRect(0, 0, imgX-1, imgY-1);
     }
@@ -74,7 +74,7 @@ public class MundoPanel extends JPanel{
         mundoDraw.fillRect(0, 0, imgX-1, imgY-1);
         mundo.resetMundo();
     }
-    private void pintaCelulas(){
+    private void pintaCelulasHilos(){
         hp1 = new HiloPintador(0,numCelX/2,0,numCelY/2,celPixeles,mundo,md1,0,0);
         hp2 = new HiloPintador(numCelX/2,numCelX,0,numCelY/2,celPixeles,mundo,md2,numCelX/2,0);
         hp3 = new HiloPintador(0,numCelX/2,numCelY/2,numCelY,celPixeles,mundo,md3,0,numCelY/2);
@@ -93,13 +93,35 @@ public class MundoPanel extends JPanel{
             Logger.getLogger(MundoPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    public void sigIteracionSimul(){
-        mundo.sigIteracion();
-        pintaCelulas();
+    private void pintaCelulasSecuencial(){
+        for(int x=0;x<numCelX;x++){
+            for(int y=0;y<numCelY;y++){
+                if(mundo.cambioCelula(x, y)){
+                    if(mundo.isCelViva(x, y)){
+                        mundoDraw.setColor(Color.WHITE);
+                    }else{
+                        mundoDraw.setColor(Color.BLACK);
+                    }
+                    mundoDraw.fillRect(x*celPixeles,y*celPixeles, celPixeles,celPixeles);
+                }
+            }
+        }
     }
-    public void randomMundoSimul(double porcen_vivas){
+    public void sigIteracionSimulHilos(){
+        mundo.sigIteracionHilos();
+        pintaCelulasHilos();
+    }
+    public void sigIteracionSimulSecuencial(){
+        mundo.sigIteracionSecuencial();
+        pintaCelulasSecuencial();
+    }
+    public void randomMundoSimulHilos(double porcen_vivas){
         mundo.inicioRandom(porcen_vivas);
-        pintaCelulas();
+        pintaCelulasHilos();
+    }
+    public void randomMundoSimulSecuencial(double porcen_vivas){
+        mundo.inicioRandom(porcen_vivas);
+        pintaCelulasSecuencial();
     }
     public void switchCelEstadoSimul(int x, int y){
         mundo.switchCelEstado(x, y);

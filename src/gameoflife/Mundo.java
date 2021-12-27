@@ -128,7 +128,7 @@ public class Mundo {
             mundo_aux[y][x]=MUERTA;
         }
     }
-    public void sigIteracion(){
+    public void sigIteracionHilos(){
         /*SIN CONTAR LOS BORDES*/
         hc1.hazIteracion();
         hc2.hazIteracion();
@@ -145,6 +145,69 @@ public class Mundo {
         
         num_vivas = hc1.getVivas()+hc2.getVivas()+hc3.getVivas()+hc4.getVivas();
         num_muertas = hc1.getMuertas()+hc2.getMuertas()+hc3.getMuertas()+hc4.getMuertas();
+        /*PARA LOS BORDES*/
+        int bordes_vivas=0,bordes_muertas = 2*dimensionX + 2*(dimensionY-2);
+        if(isToroidal()){
+            for(int x=0;x<dimensionX;x++){
+                sigEstadoBordesToroidal(x,0);
+                sigEstadoBordesToroidal(x,dimensionY-1);
+                bordes_vivas += mundo_aux[0][x];
+                bordes_vivas += mundo_aux[dimensionY-1][x];
+            }
+            for(int y=1;y<dimensionY-1;y++){
+                sigEstadoBordesToroidal(0,y);
+                sigEstadoBordesToroidal(dimensionX-1,y);
+                bordes_vivas += mundo_aux[y][0];
+                bordes_vivas += mundo_aux[y][dimensionX-1];
+            }
+        }else{
+            for(int x=0;x<dimensionX;x++){
+                sigEstadoBordesFinito(x,0);
+                sigEstadoBordesFinito(x,dimensionY-1);
+                bordes_vivas += mundo_aux[0][x];
+                bordes_vivas += mundo_aux[dimensionY-1][x];
+            }
+            for(int y=1;y<dimensionY-1;y++){
+                sigEstadoBordesFinito(0,y);
+                sigEstadoBordesFinito(dimensionX-1,y);
+                bordes_vivas += mundo_aux[y][0];
+                bordes_vivas += mundo_aux[y][dimensionX-1];
+            }
+        }
+        bordes_muertas -= bordes_vivas;
+        num_vivas += bordes_vivas;
+        num_muertas += bordes_muertas;
+        byte[][] m = mundo;
+        mundo = mundo_aux;
+        mundo_aux = m;
+    }
+    private void sigEstadoSecuencial(int x,int y){
+        int vecinas_vivas = mundo[y-1][x-1] +
+                    mundo[y-1][x] +
+                    mundo[y-1][x+1] +
+                    mundo[y][x-1] +
+                    mundo[y][x+1] +
+                    mundo[y+1][x-1] +
+                    mundo[y+1][x] +
+                    mundo[y+1][x+1];
+        if(mundo[y][x]==MUERTA && vecinas_vivas>=regla[Nmin] && vecinas_vivas<=regla[Nmax]){
+            mundo_aux[y][x]=VIVA;
+        }else if(mundo[y][x]==VIVA && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
+            mundo_aux[y][x]=VIVA;
+        }else{
+            mundo_aux[y][x]=MUERTA;
+        }
+    }
+    public void sigIteracionSecuencial(){
+        num_vivas = 0;
+        num_muertas = (dimensionX-1)*(dimensionY-1);
+        for(int x=1;x<dimensionX-1;x++){
+            for(int y=1;y<dimensionX-1;y++){
+                sigEstadoSecuencial(x,y);
+                num_vivas += mundo_aux[y][x];
+            }
+        }
+        num_muertas -= num_vivas;
         /*PARA LOS BORDES*/
         int bordes_vivas=0,bordes_muertas = 2*dimensionX + 2*(dimensionY-2);
         if(isToroidal()){
@@ -242,29 +305,6 @@ public class Mundo {
         }
         
         num_muertas-=num_vivas;
-    }
-    private void sigEstadoHash(int x,int y){
-        int vecinas_vivas = mundo[y-1][x-1] +
-                    mundo[y-1][x] +
-                    mundo[y-1][x+1] +
-                    mundo[y][x-1] +
-                    mundo[y][x+1] +
-                    mundo[y+1][x-1] +
-                    mundo[y+1][x] +
-                    mundo[y+1][x+1];
-        if(mundo[y][x]==MUERTA && vecinas_vivas>=regla[Nmin] && vecinas_vivas<=regla[Nmax]){
-            mundo_aux[y][x]=VIVA;
-            num_vivas++;
-            num_muertas--;
-        }else if(mundo[y][x]==VIVA && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
-            mundo_aux[y][x]=VIVA;
-        }else if(mundo[y][x]==VIVA){
-            mundo_aux[y][x]=MUERTA;
-            num_vivas--;
-            num_muertas++;
-        }else{
-            mundo_aux[y][x]=MUERTA;
-        }
     }
     public int mundoToInt(){
         /*if(dimensionX>5 || dimensionY>5){

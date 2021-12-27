@@ -9,9 +9,9 @@ public class HiloContador extends Thread{
     private static final byte Nmin=2;
     private static final byte Nmax=3;
     
-    private byte[][] m,maux;
+    private byte[][] m,maux,mun;
     private final int inicioX,finX,inicioY,finY;
-    private volatile int vivas,muertas;
+    private volatile int vivas,muertas,vecinas_vivas;
     private final int[] regla;
 
     /*PARA CONTROLAR EL HILO*/
@@ -34,7 +34,7 @@ public class HiloContador extends Thread{
         this.regla=regla;
     }
     private void sigEstado(int x,int y){
-        int vecinas_vivas = m[y-1][x-1] +
+        vecinas_vivas = m[y-1][x-1] +
                     m[y-1][x] +
                     m[y-1][x+1] +
                     m[y][x-1] +
@@ -60,7 +60,6 @@ public class HiloContador extends Thread{
         return muertas;
     }
     public void intercambiaMundos(){
-        byte[][] mun;
         mun = m;
         m = maux;
         maux = mun;

@@ -25,7 +25,7 @@ public class Graficas extends JFrame{
         this.setSize(1150,700);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        this.setTitle("Langton's ant graphics");
+        this.setTitle("Game of life graphics");
         this.setResizable(false);
         this.setLayout(null);
         init_components();

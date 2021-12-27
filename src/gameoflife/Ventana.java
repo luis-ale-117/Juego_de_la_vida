@@ -1,6 +1,7 @@
 package gameoflife;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -35,8 +36,8 @@ public class Ventana extends JFrame{
     private static final int DIM_MUNDO_SIMUL=700;
     private static final int DIM_TOOLS=250;
     
-    private static final int NUM_CELULAS=1000;
-    private static final int CELULA_PIXELES = 5;
+    private static final int NUM_CELULAS=10;
+    private static final int CELULA_PIXELES = 10;
     
     /*CONSTANTES PARA EL ZOOM*/
     private static final int DEFAULT_DIM_ZOOM=CELULA_PIXELES*NUM_CELULAS;
@@ -95,6 +96,7 @@ public class Ventana extends JFrame{
         scrollpanel = new JScrollPane(mp);
         scrollpanel.setViewportView(mp);
         scrollpanel.setBounds(0,0,DIM_MUNDO_SIMUL-ESPACIO_SCROLLBAR,DIM_MUNDO_SIMUL-ESPACIO_SCROLLBAR);
+        //scrollpanel.setMinimumSize(new Dimension(DIM_MUNDO_SIMUL-ESPACIO_SCROLLBAR,DIM_MUNDO_SIMUL-ESPACIO_SCROLLBAR));
         this.add(scrollpanel);
         tool = new ToolsPanel(DIM_MUNDO_SIMUL-ESPACIO_SCROLLBAR, DIM_TOOLS, DIM_MUNDO_SIMUL);
         this.add(tool);
@@ -170,8 +172,9 @@ public class Ventana extends JFrame{
             gr.updateGraphs(gen_calculos,mp.getNumVivasSimul(),graphs_updating);
             /*EN PAUSA SI LO ESTA*/
             loopSiPausado();
-            mp.muestraMundo();
-            mp.sigIteracionSimul();
+            //mp.muestraMundo();
+            mp.sigIteracionSimulSecuencial();
+            //mp.sigIteracionSimulHilos();
             mp.muestraMundo();
             tool.actualizaDatos(generation,mp.getNumMuertasSimul(),mp.getNumVivasSimul());
             try {
@@ -391,7 +394,7 @@ public class Ventana extends JFrame{
         }
 
         running = false;
-        mp.randomMundoSimul((double)spinner2.getValue());
+        mp.randomMundoSimulSecuencial((double)spinner2.getValue());
         generation = 0;
         tool.actualizaDatos(generation,mp.getNumMuertasSimul(),mp.getNumVivasSimul());
         tool.startSimEnable(true);
