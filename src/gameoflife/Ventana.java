@@ -36,7 +36,7 @@ public class Ventana extends JFrame{
     private static final int DIM_MUNDO_SIMUL=700;
     private static final int DIM_TOOLS=250;
     
-    private static final int NUM_CELULAS=10;
+    private static final int NUM_CELULAS=100;
     private static final int CELULA_PIXELES = 10;
     
     /*CONSTANTES PARA EL ZOOM*/
@@ -70,6 +70,7 @@ public class Ventana extends JFrame{
     public JMenuItem abrir_arch,save_arch;
     
     public Graficas gr;
+    public DiagramasCiclos diag_atrac;
     
     /*BANDERAS*/
     public boolean running,switch_cell,graphs_updating;
@@ -87,12 +88,12 @@ public class Ventana extends JFrame{
     
     public void iniciaVentanaComponentes(){
         mp = new MundoPanel(CELULA_PIXELES,NUM_CELULAS);
-        mp.addMouse(new MouseAdapter(){
+        /*mp.addMouse(new MouseAdapter(){
             public void mouseClicked(MouseEvent e){
                 //placeAnt(e);
                 //changeCell(e);
             }
-        });
+        });*/
         scrollpanel = new JScrollPane(mp);
         scrollpanel.setViewportView(mp);
         scrollpanel.setBounds(0,0,DIM_MUNDO_SIMUL-ESPACIO_SCROLLBAR,DIM_MUNDO_SIMUL-ESPACIO_SCROLLBAR);
@@ -114,6 +115,10 @@ public class Ventana extends JFrame{
         this.setJMenuBar(barra_menu);
         
         gr =  new Graficas();
+        diag_atrac = new DiagramasCiclos();
+        diag_atrac.setVisible(false);
+        diag_atrac.setEnabled(false);
+        this.add(diag_atrac);
         
         setButtonsActions();
         
@@ -136,22 +141,23 @@ public class Ventana extends JFrame{
         //Atractores at3x3 = new Atractores(3,3);
         //at3x3.calculaTransiciones();
         //System.out.println(at3x3);
-        /*Atractores at4x4 = new Atractores(4,5);
-        at4x4.calculaTransiciones();
+        /*int n=5,m=5;
+        Atractores at= new Atractores(n,m);
+        at.calculaTransiciones();
         System.out.println("Fin del calculo");
         //System.out.println(at4x4);
-        File f = new File("4x5.dot");
+        File f = new File(n+"x"+m+"prueba1.dot");
         FileWriter f_w = null;
         PrintWriter f_pr = null;
         try {
             f_w = new FileWriter(f);
             f_pr = new PrintWriter(f_w);
-            f_pr.write(at4x4.toStringInicio());
-            int pot = (int) Math.pow(2, 4*5);
+            f_pr.write(at.toStringInicio());
+            int pot = (int) Math.pow(2, n*m);
             for(int i=0;i<pot;i++){
-                f_pr.write(at4x4.toStringIndex(i));
+                f_pr.write(at.toStringIndex(i));
             }
-            f_pr.write(at4x4.toStringFin());
+            f_pr.write(at.toStringFin());
             //f_pr.write(at4x4.toString());
         } catch (IOException ex) {
             Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
@@ -263,6 +269,18 @@ public class Ventana extends JFrame{
                 aplicaRegla();
             }
         });
+        tool.addAction_Atractores(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showAtractoresWin();
+            }
+        });
+        diag_atrac.addAction_Simul(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                regresaSimulacion();
+            }
+        });
         save_arch.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
@@ -285,6 +303,7 @@ public class Ventana extends JFrame{
             //tool.reglasEnable(false);
             tool.randomEnable(false);
             tool.resetEnable(false);
+            tool.atractoresEnable(false);
         }
         else{
             tool.startSimText("Sigue");
@@ -292,6 +311,7 @@ public class Ventana extends JFrame{
             tool.reglasEnable(true);
             tool.randomEnable(true);
             tool.resetEnable(true);
+            tool.atractoresEnable(true);
         }
     }
     private void zoomSimulation(){
@@ -441,6 +461,25 @@ public class Ventana extends JFrame{
             }
         mp.setReglaSimul(tool.getSmin(),tool.getSmax(),tool.getNmin(),tool.getNmax());
         running=play;
+    }
+    private void showAtractoresWin(){
+        diag_atrac.setVisible(!diag_atrac.isVisible());
+        scrollpanel.setVisible(false);
+        scrollpanel.setEnabled(false);
+        tool.setVisible(false);
+        tool.setEnabled(false);
+        diag_atrac.setVisible(true);
+        diag_atrac.setEnabled(true);
+        
+        //diag_atrac = diag_atrac.isVisible();
+    }
+    private void regresaSimulacion(){
+        scrollpanel.setVisible(true);
+        scrollpanel.setEnabled(true);
+        tool.setVisible(true);
+        tool.setEnabled(true);
+        diag_atrac.setVisible(false);
+        diag_atrac.setEnabled(false);
     }
     private void saveFile(){
     }

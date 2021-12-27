@@ -12,12 +12,12 @@ import javax.swing.JPanel;
 
 public class MundoPanel extends JPanel{
     private int simulX,simulY;//Varia con el zoom
-    private final int celPixeles,numCelX,numCelY;
-    private final int imgX,imgY;//Tamaño original de la imagen
-    private final BufferedImage mundoImg;
-    private final Graphics mundoDraw,md1,md2,md3,md4;
+    private int celPixeles,numCelX,numCelY;
+    private int imgX,imgY;//Tamaño original de la imagen
+    private BufferedImage mundoImg;
+    private Graphics mundoDraw,md1,md2,md3,md4;
     
-    private final Mundo mundo;
+    private Mundo mundo;
     
     private HiloPintador hp1,hp2,hp3,hp4;
     
@@ -35,10 +35,10 @@ public class MundoPanel extends JPanel{
         mundoImg = new BufferedImage(simulX,simulY,BufferedImage.TYPE_INT_RGB);
         mundoDraw = mundoImg.createGraphics();
         /*Para los hilos*/
-        md1 = mundoDraw.create(0, 0, imgX/2, imgY/2);
+        /*md1 = mundoDraw.create(0, 0, imgX/2, imgY/2);
         md2 = mundoDraw.create(imgX/2, 0, imgX/2, imgY/2);
         md3 = mundoDraw.create(0, imgY/2, imgX/2, imgY/2);
-        md4 = mundoDraw.create(imgX/2, imgY/2, imgX/2, imgY/2);
+        md4 = mundoDraw.create(imgX/2, imgY/2, imgX/2, imgY/2);*/
     }
     MundoPanel(int celPix, int mundoX, int mundoY){//Puede ser rectangular
         super();
@@ -153,6 +153,49 @@ public class MundoPanel extends JPanel{
     }
     public int getNumVivasSimul(){
         return mundo.getNumVivas();
+    }
+    public void cambiaDimensiones(int x, int y){
+        numCelX = x;
+        numCelY = y;
+        //int maxX=5,maxY=5;
+        simulX = numCelX*celPixeles;
+        simulY = numCelY*celPixeles;
+        imgX = numCelX*celPixeles;
+        imgY = numCelY*celPixeles;
+        setPreferredSize(new Dimension(simulX,simulY));
+        mundo = new Mundo(numCelX,numCelY);
+        
+        mundoImg = new BufferedImage(simulX,simulY,BufferedImage.TYPE_INT_RGB);
+        mundoDraw = mundoImg.createGraphics();
+        mundoDraw.setColor(Color.BLACK);
+        mundoDraw.fillRect(0, 0, imgX-1, imgY-1);
+        
+        muestraMundo();
+    }
+    public int mundoToIntPanel(){
+        return mundo.mundoToInt();
+    }
+    private void pintaTodasCelulasSecuencial(){
+        for(int x=0;x<numCelX;x++){
+            for(int y=0;y<numCelY;y++){
+                if(mundo.isCelViva(x, y)){
+                    mundoDraw.setColor(Color.WHITE);
+                }else{
+                    mundoDraw.setColor(Color.BLACK);
+                }
+                mundoDraw.fillRect(x*celPixeles,y*celPixeles, celPixeles,celPixeles);
+            }
+        }
+    }
+    public void sigIteracionTodasSecuencial(){
+        mundo.sigIteracionGeneralToroidalSecuencial();
+        pintaTodasCelulasSecuencial();
+        muestraMundo();
+    }
+    public void intToMundoPanel(int n){
+        mundo.intToMundo(n);
+        pintaTodasCelulasSecuencial();
+        muestraMundo();
     }
     @Override
     public void paintComponent(Graphics g){

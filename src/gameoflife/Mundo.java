@@ -41,11 +41,11 @@ public class Mundo {
                 mundo_aux[ys][xs] = MUERTA;
             }
         }
-        hc1 = new HiloContador(mundo,mundo_aux, 1, dimensionX/2, 1, dimensionY/2 ,regla);
+        /*hc1 = new HiloContador(mundo,mundo_aux, 1, dimensionX/2, 1, dimensionY/2 ,regla);
         hc2 = new HiloContador(mundo,mundo_aux, dimensionX/2, dimensionX-1, 1, dimensionY/2 ,regla);
         hc3 = new HiloContador(mundo,mundo_aux, 1, dimensionX/2, dimensionY/2, dimensionY-1 ,regla);
         hc4 = new HiloContador(mundo,mundo_aux, dimensionX/2, dimensionX-1, dimensionY/2, dimensionY-1 ,regla);
-        
+        */
         //Para las transiciones
         estado_int=0;n=1;
     }
@@ -202,7 +202,7 @@ public class Mundo {
         num_vivas = 0;
         num_muertas = (dimensionX-1)*(dimensionY-1);
         for(int x=1;x<dimensionX-1;x++){
-            for(int y=1;y<dimensionX-1;y++){
+            for(int y=1;y<dimensionY-1;y++){
                 sigEstadoSecuencial(x,y);
                 num_vivas += mundo_aux[y][x];
             }
@@ -240,6 +240,43 @@ public class Mundo {
         bordes_muertas -= bordes_vivas;
         num_vivas += bordes_vivas;
         num_muertas += bordes_muertas;
+        byte[][] m = mundo;
+        mundo = mundo_aux;
+        mundo_aux = m;
+    }
+    private void sigEstadoGeneralToroidalSecuencial(int x,int y){
+        int ymenos1 = y-1<0?dimensionY-1:y-1;
+        int ymas1 = y+1>=dimensionY?0:y+1;
+        int xmenos1 = x-1<0?dimensionX-1:x-1;
+        int xmas1 = x+1>=dimensionX?0:x+1;
+        
+        int vecinas_vivas = mundo[ymenos1][xmenos1] +
+                    mundo[ymenos1][x] +
+                    mundo[ymenos1][xmas1] +
+                    mundo[y][xmenos1] +
+                    mundo[y][xmas1] +
+                    mundo[ymas1][xmenos1] +
+                    mundo[ymas1][x] +
+                    mundo[ymas1][xmas1];
+        if(mundo[y][x]==MUERTA && vecinas_vivas>=regla[Nmin] && vecinas_vivas<=regla[Nmax]){
+            mundo_aux[y][x]=VIVA;
+        }else if(mundo[y][x]==VIVA && vecinas_vivas>=regla[Smin] && vecinas_vivas<=regla[Smax]){
+            mundo_aux[y][x]=VIVA;
+        }else{
+            mundo_aux[y][x]=MUERTA;
+        }
+    }
+    public void sigIteracionGeneralToroidalSecuencial(){
+        num_vivas = 0;
+        num_muertas = (dimensionX)*(dimensionY);
+        for(int x=0;x<dimensionX;x++){
+            for(int y=0;y<dimensionY;y++){
+                sigEstadoGeneralToroidalSecuencial(x,y);
+                num_vivas += mundo_aux[y][x];
+            }
+        }
+        num_muertas -= num_vivas;
+        
         byte[][] m = mundo;
         mundo = mundo_aux;
         mundo_aux = m;

@@ -9,6 +9,7 @@ public class HiloTransicion extends Thread{
     public HiloTransicion(Mundo m, int index_inicio, int index_fin,int[] transiciones_t0,int[] transiciones_t1) {
         super();
         this.m = m;
+        //this.m.iniciaHilosContadores();
         this.index_inicio = index_inicio;
         this.index_fin = index_fin;
         this.transiciones_t0 = transiciones_t0;
@@ -19,7 +20,7 @@ public class HiloTransicion extends Thread{
         int valmundo;
         for(int i=index_inicio;i<index_fin;i++){
             m.intToMundo(i);
-            m.sigIteracionHilos();
+            m.sigIteracionSecuencial();
             valmundo = m.mundoToInt();
             transiciones_t0[i]= i;
             transiciones_t1[i]= valmundo;

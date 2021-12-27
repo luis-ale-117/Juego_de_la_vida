@@ -14,7 +14,7 @@ import javax.swing.event.ChangeListener;
 public class ToolsPanel extends JPanel{
     
     private JLabel generacion,celdas_muertas,celdas_vivas,zo_label,vel_label,rule_label;
-    private JButton start_sim,graph,reset,random;
+    private JButton start_sim,graph,reset,random,atractores;
     private JToggleButton edit_cell;
     private JSlider zoom_sld,vel_sld;
     private JSpinner smin,smax,nmin,nmax;
@@ -81,7 +81,7 @@ public class ToolsPanel extends JPanel{
         random.setBounds(5, 265, 90, 30);
         this.add(random);
         
-        edit_cell = new JToggleButton("Edit");
+        edit_cell = new JToggleButton("Editar");
         edit_cell.setBounds(100, 265, 80, 30);
         this.add(edit_cell);
         
@@ -105,6 +105,10 @@ public class ToolsPanel extends JPanel{
         this.add(smax);
         this.add(nmin);
         this.add(nmax);
+        
+        atractores = new JButton("Atractores");
+        atractores.setBounds(5, 360, 100, 30);
+        this.add(atractores);
     }
     public void startSimEnable(boolean b){
         start_sim.setEnabled(b);
@@ -120,6 +124,9 @@ public class ToolsPanel extends JPanel{
     }
     public void randomEnable(boolean b){
         random.setEnabled(b);
+    }
+    public void atractoresEnable(boolean b){
+        atractores.setEnabled(b);
     }
     public void resetEnable(boolean b){
         reset.setEnabled(b);
@@ -182,5 +189,8 @@ public class ToolsPanel extends JPanel{
         smax.addChangeListener(l);
         nmin.addChangeListener(l);
         nmax.addChangeListener(l);
+    }
+    public void addAction_Atractores(ActionListener l){
+        atractores.addActionListener(l);
     }
 }
