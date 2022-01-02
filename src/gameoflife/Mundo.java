@@ -386,6 +386,16 @@ public class Mundo {
             }
         }
     }
+
+    public byte[][] getMundo() {
+        byte[][] m = new byte[dimensionY][dimensionX];
+        for(int x = 0; x < dimensionX;x++){
+            for(int y = 0; y < dimensionY;y++){
+                m[y][x] = mundo[y][x];
+            }
+        }
+        return m;
+    }
     public int getDimensionX() {
         return dimensionX;
     }

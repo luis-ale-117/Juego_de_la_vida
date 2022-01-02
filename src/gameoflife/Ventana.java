@@ -37,7 +37,7 @@ public class Ventana extends JFrame{
     private static final int DIM_TOOLS=250;
     
     private static final int NUM_CELULAS=100;
-    private static final int CELULA_PIXELES = 10;
+    private static final int CELULA_PIXELES = 5;
     
     /*CONSTANTES PARA EL ZOOM*/
     private static final int DEFAULT_DIM_ZOOM=CELULA_PIXELES*NUM_CELULAS;
