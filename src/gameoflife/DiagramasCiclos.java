@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -22,6 +25,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class DiagramasCiclos extends JPanel{
     
@@ -30,7 +34,7 @@ public class DiagramasCiclos extends JPanel{
     private JScrollPane diagrama_scroll;
     private JLabel diagrama_panel,mundo_actual,mundo_siguiente,rule_label;
     private ImageIcon diagrama_img;
-    private JButton simulacion,calcula_atractores;
+    private JButton simulacion,calcula_atractores,imagen_diagrama;
     private JSpinner mundoX,mundoY,config,smin,smax,nmin,nmax;
     private SpinnerNumberModel sm1,sm2,sm3;
     private MundoPanel mu1,mu2;
@@ -45,7 +49,7 @@ public class DiagramasCiclos extends JPanel{
     }
     private void init_components(){
         
-        diagrama_img = new ImageIcon("out.png");
+        diagrama_img = new ImageIcon();
         diagrama_panel=new JLabel(diagrama_img);
         
         diagrama_scroll = new JScrollPane(diagrama_panel);
@@ -73,15 +77,15 @@ public class DiagramasCiclos extends JPanel{
         config.setBounds(755, 50, 110, 30);
         this.add(config);
         
-        mundo_actual = new JLabel("Mundo en t");
+        mundo_actual = new JLabel("Mundo en t: 0");
         mundo_actual.setBounds(675,100, 160, 20);
         mundo_actual.setEnabled(true);
         this.add(mundo_actual);
         
-        mundo_actual = new JLabel("Mundo en t+1");
-        mundo_actual.setBounds(675,200, 160, 20);
-        mundo_actual.setEnabled(true);
-        this.add(mundo_actual);
+        mundo_siguiente = new JLabel("Mundo en t+1: 0");
+        mundo_siguiente.setBounds(675,200, 160, 20);
+        mundo_siguiente.setEnabled(true);
+        this.add(mundo_siguiente);
         
         mu1 = new MundoPanel(PIXELES,(int)mundoX.getValue(),(int)mundoY.getValue());
         mu1.setBounds(675,120,5*PIXELES,5*PIXELES);
@@ -116,6 +120,11 @@ public class DiagramasCiclos extends JPanel{
         calcula_atractores.setBounds(675,350, 140, 30);
         calcula_atractores.setEnabled(true);
         this.add(calcula_atractores);
+        
+        imagen_diagrama = new JButton("Diagrama");
+        imagen_diagrama.setBounds(675,390, 100, 30);
+        imagen_diagrama.setEnabled(true);
+        this.add(imagen_diagrama);
         
         add_ActionComponents();
     }
@@ -180,6 +189,29 @@ public class DiagramasCiclos extends JPanel{
                     calculaAtractoresDot();
                 }
         });
+        imagen_diagrama.addActionListener(
+            new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    seleccionImagenDiagrama();
+                }
+        });
+    }
+    private void seleccionImagenDiagrama(){
+        String userhome = System.getProperty("user.home");
+        JFileChooser selectorArch = new JFileChooser(userhome+"\\OneDrive\\Documentos\\NetBeansProjects\\GameOfLife");
+        selectorArch.setMultiSelectionEnabled(false);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Imagen","png");
+        selectorArch.setFileFilter(filter);
+
+        int respuesta = selectorArch.showOpenDialog(this);
+
+        if(respuesta == JFileChooser.APPROVE_OPTION){
+            File arch = selectorArch.getSelectedFile();
+            diagrama_img = new ImageIcon(arch.getAbsolutePath());
+            diagrama_panel.setIcon(diagrama_img);
+            diagrama_scroll.setViewportView(diagrama_panel);
+        }
     }
     private void cambiaDimensionesMundoPrueba(){
         mu1.setVisible(false);mu2.setVisible(false);
@@ -200,6 +232,9 @@ public class DiagramasCiclos extends JPanel{
         mu2.sigIteracionTodasSecuencial();
 
         mu1.setVisible(true);mu2.setVisible(true);
+        
+        mundo_actual.setText("Mundo en t: "+ (int)config.getValue());
+        mundo_siguiente.setText("Mundo en t+1: "+ mu2.mundoToIntPanel());
     }
     private void cambiaRegla(){
         mu1.setReglaSimul((int)smin.getValue(), (int)smax.getValue(), (int)nmin.getValue(), (int)nmax.getValue());
@@ -271,7 +306,7 @@ public class DiagramasCiclos extends JPanel{
         res=JOptionPane.YES_OPTION;
         if(f2.exists()){
             res = JOptionPane.showConfirmDialog(this,
-                "Los atractores sin simetrías" +n+"x"+m+" ya han sido calculados.\n¿Desea recalcularlos?",
+                "Los atractores sin simetrías " +n+"x"+m+" ya han sido calculados.\n¿Desea recalcularlos?",
                 "Atractores sin simetrías ya calculados",
                 JOptionPane.YES_NO_OPTION);
         }else{
@@ -408,6 +443,5 @@ public class DiagramasCiclos extends JPanel{
                     "Error al generar diagrama",
                     JOptionPane.ERROR_MESSAGE);
         }
-
     }
 }

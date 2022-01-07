@@ -36,8 +36,8 @@ public class Ventana extends JFrame{
     private static final int DIM_MUNDO_SIMUL=700;
     private static final int DIM_TOOLS=250;
     
-    private static final int NUM_CELULAS=100;
-    private static final int CELULA_PIXELES = 5;
+    private static final int NUM_CELULAS=10;
+    private static final int CELULA_PIXELES = 10;
     
     /*CONSTANTES PARA EL ZOOM*/
     private static final int DEFAULT_DIM_ZOOM=CELULA_PIXELES*NUM_CELULAS;
@@ -135,44 +135,6 @@ public class Ventana extends JFrame{
         mp.muestraMundo();
     }
     public void comienzaSimulacion(){
-        //Atractores at2x2 = new Atractores(2,2);
-        //at2x2.calculaTransiciones();
-        //System.out.println(at2x2);
-        //Atractores at3x3 = new Atractores(3,3);
-        //at3x3.calculaTransiciones();
-        //System.out.println(at3x3);
-        /*int n=5,m=5;
-        Atractores at= new Atractores(n,m);
-        at.calculaTransiciones();
-        System.out.println("Fin del calculo");
-        //System.out.println(at4x4);
-        File f = new File(n+"x"+m+"prueba1.dot");
-        FileWriter f_w = null;
-        PrintWriter f_pr = null;
-        try {
-            f_w = new FileWriter(f);
-            f_pr = new PrintWriter(f_w);
-            f_pr.write(at.toStringInicio());
-            int pot = (int) Math.pow(2, n*m);
-            for(int i=0;i<pot;i++){
-                f_pr.write(at.toStringIndex(i));
-            }
-            f_pr.write(at.toStringFin());
-            //f_pr.write(at4x4.toString());
-        } catch (IOException ex) {
-            Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-                try {
-                    f_pr.close();
-                    f_w.close();
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(this,
-                    "Error al intentar cerrar el archvio\nError: "+ex,
-                    "Error en Archivo",
-                    JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        */
         chooseKindOfWorld();
         while(true){
             gr.updateGraphs(gen_calculos,mp.getNumVivasSimul(),graphs_updating);

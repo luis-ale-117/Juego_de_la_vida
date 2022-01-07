@@ -8,7 +8,7 @@ public class Atractores {
     private final Mundo munH1,munH2,munH3,munH4,munH5,munH6,munH7,munH8;
     private final int[] transiciones_t0,transiciones_t1,sin_simetria_t0,sin_simetria_t1;
     private int num_simet;
-    private int permutaciones,permutaciones_hilo;
+    private final int permutaciones,permutaciones_hilo;
     private HiloTransicion h1,h2,h3,h4,h5,h6,h7,h8;
     
     Atractores(int tamx, int tamy){
@@ -184,16 +184,19 @@ public class Atractores {
             }
         }
         /*Elimina las simetrias de destino*/
+        
+        
+        
         for(int i=1;i<num_simet;i++){
             simetria = false;
             munH1.intToMundo(sin_simetria_t1[i]);
             m1=munH1.getMundo();
-            for(int j=0;j<i;j++){
-                munH2.intToMundo(sin_simetria_t1[j]);
+            for(int j=0;j<num_simet;j++){
+                munH2.intToMundo(sin_simetria_t0[j]);
                 m2 = munH2.getMundo();
                 simetria = comparaSimetria(m1,m2,x,y);
                 if(simetria){
-                    sin_simetria_t1[j] = sin_simetria_t1[i];
+                    sin_simetria_t1[i] = sin_simetria_t0[j];
                     break;
                 }
             }

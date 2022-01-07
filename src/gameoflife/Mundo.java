@@ -200,46 +200,42 @@ public class Mundo {
     }
     public void sigIteracionSecuencial(){
         num_vivas = 0;
-        num_muertas = (dimensionX-1)*(dimensionY-1);
+        num_muertas = (dimensionX)*(dimensionY);
         for(int x=1;x<dimensionX-1;x++){
             for(int y=1;y<dimensionY-1;y++){
                 sigEstadoSecuencial(x,y);
                 num_vivas += mundo_aux[y][x];
             }
         }
-        num_muertas -= num_vivas;
         /*PARA LOS BORDES*/
-        int bordes_vivas=0,bordes_muertas = 2*dimensionX + 2*(dimensionY-2);
         if(isToroidal()){
             for(int x=0;x<dimensionX;x++){
                 sigEstadoBordesToroidal(x,0);
                 sigEstadoBordesToroidal(x,dimensionY-1);
-                bordes_vivas += mundo_aux[0][x];
-                bordes_vivas += mundo_aux[dimensionY-1][x];
+                num_vivas += mundo_aux[0][x];
+                num_vivas += mundo_aux[dimensionY-1][x];
             }
             for(int y=1;y<dimensionY-1;y++){
                 sigEstadoBordesToroidal(0,y);
                 sigEstadoBordesToroidal(dimensionX-1,y);
-                bordes_vivas += mundo_aux[y][0];
-                bordes_vivas += mundo_aux[y][dimensionX-1];
+                num_vivas += mundo_aux[y][0];
+                num_vivas += mundo_aux[y][dimensionX-1];
             }
         }else{
             for(int x=0;x<dimensionX;x++){
                 sigEstadoBordesFinito(x,0);
                 sigEstadoBordesFinito(x,dimensionY-1);
-                bordes_vivas += mundo_aux[0][x];
-                bordes_vivas += mundo_aux[dimensionY-1][x];
+                num_vivas += mundo_aux[0][x];
+                num_vivas += mundo_aux[dimensionY-1][x];
             }
             for(int y=1;y<dimensionY-1;y++){
                 sigEstadoBordesFinito(0,y);
                 sigEstadoBordesFinito(dimensionX-1,y);
-                bordes_vivas += mundo_aux[y][0];
-                bordes_vivas += mundo_aux[y][dimensionX-1];
+                num_vivas += mundo_aux[y][0];
+                num_vivas += mundo_aux[y][dimensionX-1];
             }
         }
-        bordes_muertas -= bordes_vivas;
-        num_vivas += bordes_vivas;
-        num_muertas += bordes_muertas;
+        num_muertas -= num_vivas;
         byte[][] m = mundo;
         mundo = mundo_aux;
         mundo_aux = m;
