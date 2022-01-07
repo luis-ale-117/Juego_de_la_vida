@@ -1,6 +1,7 @@
 package gameoflife;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -35,8 +36,8 @@ public class Ventana extends JFrame{
     private static final int DIM_MUNDO_SIMUL=700;
     private static final int DIM_TOOLS=250;
     
-    private static final int NUM_CELULAS=1000;
-    private static final int CELULA_PIXELES = 5;
+    private static final int NUM_CELULAS=10;
+    private static final int CELULA_PIXELES = 10;
     
     /*CONSTANTES PARA EL ZOOM*/
     private static final int DEFAULT_DIM_ZOOM=CELULA_PIXELES*NUM_CELULAS;
@@ -68,6 +69,9 @@ public class Ventana extends JFrame{
     public JMenu archivo;
     public JMenuItem abrir_arch,save_arch;
     
+    public Graficas gr;
+    public DiagramasCiclos diag_atrac;
+    
     /*BANDERAS*/
     public boolean running,switch_cell,graphs_updating;
     
@@ -84,15 +88,16 @@ public class Ventana extends JFrame{
     
     public void iniciaVentanaComponentes(){
         mp = new MundoPanel(CELULA_PIXELES,NUM_CELULAS);
-        mp.addMouse(new MouseAdapter(){
+        /*mp.addMouse(new MouseAdapter(){
             public void mouseClicked(MouseEvent e){
                 //placeAnt(e);
                 //changeCell(e);
             }
-        });
+        });*/
         scrollpanel = new JScrollPane(mp);
         scrollpanel.setViewportView(mp);
         scrollpanel.setBounds(0,0,DIM_MUNDO_SIMUL-ESPACIO_SCROLLBAR,DIM_MUNDO_SIMUL-ESPACIO_SCROLLBAR);
+        //scrollpanel.setMinimumSize(new Dimension(DIM_MUNDO_SIMUL-ESPACIO_SCROLLBAR,DIM_MUNDO_SIMUL-ESPACIO_SCROLLBAR));
         this.add(scrollpanel);
         tool = new ToolsPanel(DIM_MUNDO_SIMUL-ESPACIO_SCROLLBAR, DIM_TOOLS, DIM_MUNDO_SIMUL);
         this.add(tool);
@@ -109,7 +114,11 @@ public class Ventana extends JFrame{
         barra_menu.add(archivo);
         this.setJMenuBar(barra_menu);
         
-        //gr =  new GraphicsWindow();
+        gr =  new Graficas();
+        diag_atrac = new DiagramasCiclos();
+        diag_atrac.setVisible(false);
+        diag_atrac.setEnabled(false);
+        this.add(diag_atrac);
         
         setButtonsActions();
         
@@ -128,11 +137,12 @@ public class Ventana extends JFrame{
     public void comienzaSimulacion(){
         chooseKindOfWorld();
         while(true){
-            //gr.updateGraphs(gen_calculos,mp.getNumVivasSimul(),graphs_updating);
+            gr.updateGraphs(gen_calculos,mp.getNumVivasSimul(),graphs_updating);
             /*EN PAUSA SI LO ESTA*/
             loopSiPausado();
-            mp.muestraMundo();
-            mp.sigIteracionSimul();
+            //mp.muestraMundo();
+            mp.sigIteracionSimulSecuencial();
+            //mp.sigIteracionSimulHilos();
             mp.muestraMundo();
             tool.actualizaDatos(generation,mp.getNumMuertasSimul(),mp.getNumVivasSimul());
             try {
@@ -140,9 +150,6 @@ public class Ventana extends JFrame{
             } catch (InterruptedException ex) {
                 Logger.getLogger(GameOfLife.class.getName()).log(Level.SEVERE, null, ex);
             }
-            /*PINTA LAS CELDAS DONDE ESTUVIERON LAS HORMIGAS*/
-            //paintCellsAndLines();
-            //ifSimEnded();
             generation++;
             if(graphs_updating){
                 gen_calculos++;
@@ -179,7 +186,7 @@ public class Ventana extends JFrame{
         tool.addAction_Graph(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                //showGraphicsWin();
+                showGraphicsWin();
             }
         });
         tool.addAction_Reset(new ActionListener(){
@@ -218,6 +225,24 @@ public class Ventana extends JFrame{
                 speedSimulation();
             }
         });
+        tool.addChange_Regla(new ChangeListener(){
+            @Override
+            public void stateChanged(ChangeEvent e){
+                aplicaRegla();
+            }
+        });
+        tool.addAction_Atractores(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showAtractoresWin();
+            }
+        });
+        diag_atrac.addAction_Simul(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                regresaSimulacion();
+            }
+        });
         save_arch.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
@@ -237,10 +262,18 @@ public class Ventana extends JFrame{
         if(running){
             tool.startSimText("Pausa");
             tool.editEnable(false);
+            //tool.reglasEnable(false);
+            tool.randomEnable(false);
+            tool.resetEnable(false);
+            tool.atractoresEnable(false);
         }
         else{
             tool.startSimText("Sigue");
             tool.editEnable(true);
+            tool.reglasEnable(true);
+            tool.randomEnable(true);
+            tool.resetEnable(true);
+            tool.atractoresEnable(true);
         }
     }
     private void zoomSimulation(){
@@ -316,30 +349,11 @@ public class Ventana extends JFrame{
         }
     }
     private void switchEstadoCelula(){    
-//        SpinnerNumberModel sModel1 = new SpinnerNumberModel(0, 0, 999, 1);
-//        SpinnerNumberModel sModel2 = new SpinnerNumberModel(0, 0, 999, 1);
-//        JSpinner spinnerX = new JSpinner(sModel1);
-//        JSpinner spinnerY = new JSpinner(sModel2);
-//        Object[] ob= new Object[5];
-//        ob[0] = "¿Desea ingresar una posicion sin mouse?";
-//        ob[1] = "Posicion en X";
-//        ob[2] = spinnerX;
-//        ob[3] = "Posicion en Y";
-//        ob[4] = spinnerY;
-//        int op = JOptionPane.showOptionDialog(null, ob, "Posicion de la Hormiga", JOptionPane.OK_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
-        //Deten la simulacion
         switch_cell = true;
         running = false;
         tool.startSimText("Sigue");
         tool.startSimEnable(false);
         tool.setZoomDefault();
-
-//        if (op == JOptionPane.OK_OPTION){
-//            switch_cell = false;
-//            tool.startSimEnable(true);
-//        }else{
-//            tool.zoom_sld.setValue(0);
-//        }
     }
     private void resetSim(){
         running = false;
@@ -347,14 +361,14 @@ public class Ventana extends JFrame{
         generation = 0;
         tool.actualizaDatos(0,mp.getNumMuertasSimul(),mp.getNumVivasSimul());
         //gr.clearGraphics();
-        tool.startSimEnable(false);
+        tool.startSimEnable(true);
         //chooseKindOfWorld();
 //        if(tool.zoom_sld.getValue()<0){
 //            tool.zoom_sld.setValue(0);
 //        }
     }
     private void randomSim(){
-        SpinnerNumberModel sModel2 = new SpinnerNumberModel(0, 0, 100, 0.01);
+        SpinnerNumberModel sModel2 = new SpinnerNumberModel(0, 0, 100, 0.1);
         JSpinner spinner2 = new JSpinner(sModel2);
         int option2 = JOptionPane.showOptionDialog(this, spinner2, "Porcentaje casillas vivas", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
         if (option2 == JOptionPane.CANCEL_OPTION){
@@ -362,14 +376,14 @@ public class Ventana extends JFrame{
         }
 
         running = false;
-        mp.randomMundoSimul((double)spinner2.getValue());
+        mp.randomMundoSimulSecuencial((double)spinner2.getValue());
         generation = 0;
         tool.actualizaDatos(generation,mp.getNumMuertasSimul(),mp.getNumVivasSimul());
         tool.startSimEnable(true);
     }
     private void showGraphicsWin(){
-        //gr.setVisible(!gr.isVisible());
-        //graphs_updating = gr.isVisible();
+        gr.setVisible(!gr.isVisible());
+        graphs_updating = gr.isVisible();
     }
     private void editCellValue(){
         if(tool.editSelected()){
@@ -380,8 +394,12 @@ public class Ventana extends JFrame{
             running = false;
             tool.startSimText("Sigue");
             tool.startSimEnable(false);
+            tool.randomEnable(false);
+            tool.resetEnable(false);
         }else{
             tool.startSimEnable(true);
+            tool.randomEnable(true);
+            tool.resetEnable(true);
         }
         
     }
@@ -394,6 +412,36 @@ public class Ventana extends JFrame{
                 mp.switchCelEstadoSimul(pos_x, pos_y);
             }
         }
+    }
+    private void aplicaRegla(){
+        boolean play = running;
+        running = false;
+        try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(GameOfLife.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        mp.setReglaSimul(tool.getSmin(),tool.getSmax(),tool.getNmin(),tool.getNmax());
+        running=play;
+    }
+    private void showAtractoresWin(){
+        diag_atrac.setVisible(!diag_atrac.isVisible());
+        scrollpanel.setVisible(false);
+        scrollpanel.setEnabled(false);
+        tool.setVisible(false);
+        tool.setEnabled(false);
+        diag_atrac.setVisible(true);
+        diag_atrac.setEnabled(true);
+        
+        //diag_atrac = diag_atrac.isVisible();
+    }
+    private void regresaSimulacion(){
+        scrollpanel.setVisible(true);
+        scrollpanel.setEnabled(true);
+        tool.setVisible(true);
+        tool.setEnabled(true);
+        diag_atrac.setVisible(false);
+        diag_atrac.setEnabled(false);
     }
     private void saveFile(){
     }
